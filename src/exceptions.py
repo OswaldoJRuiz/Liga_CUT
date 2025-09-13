@@ -15,7 +15,7 @@ class UserAlreadyExistsError(HTTPException):
 
 class InvalidCredentialsError(HTTPException):
     def __init__(self):
-        super().__init__(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password")
+        super().__init__(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password", headers={"WWW-Authenticate": "Bearer"},)
 
 class WeakPasswordError(HTTPException):
     def __init__(self, msg: str = "Weak password"):
