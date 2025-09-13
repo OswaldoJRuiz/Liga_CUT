@@ -16,7 +16,7 @@ async def require_panel_access(
     db: AsyncSession = Depends(get_db),
 ):
     if not any(p.name == "admin:panel.access" for p in current_user.permissions):
-        raise ForbiddenError("You do not have permission to access the admin panel")  # Nosotros tenemos nuestro manejo de errores y lo importamos de exceptions.py
+        raise ForbiddenError("No tienes acceso a este panel!")  # Nosotros tenemos nuestro manejo de errores y lo importamos de exceptions.py
     return current_user
 
 @router.get("/dashboard", dependencies=[Depends(require_panel_access)])
