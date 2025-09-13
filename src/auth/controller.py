@@ -1,8 +1,9 @@
 # Liga_CUT/src/auth/controller.py
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 from auth.dependencies import get_current_user, User
+from exceptions import UserAlreadyExistsError, InvalidCredentialsError, WeakPasswordError
 
 from database.sessions import get_db
 from auth.schemas import UserCreate, UserRead, UserLogin, Token
@@ -30,13 +31,13 @@ async def register(payload: UserCreate, db: AsyncSession = Depends(get_db)):
     # verificar duplicado
     existing_user = await get_user_by_email(db, payload.email)
     if existing_user:
-        raise HTTPException(status_code=409, detail="Email already registered")
+        raise UserAlreadyExistsError()
 
     # crear usuario (con validación de password)
     try:
         user = await create_user(db, payload.email, payload.password)
     except ValueError as e:
-        raise HTTPException(status_code=422, detail=str(e))
+        raise WeakPasswordError(str(e))
 
     return user
 
@@ -44,11 +45,7 @@ async def register(payload: UserCreate, db: AsyncSession = Depends(get_db)):
 async def login(payload: UserLogin, db: AsyncSession = Depends(get_db)):
     user = await authenticate_user(db, payload.email, payload.password)
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid email or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+        raise InvalidCredentialsError("Invalid email or password")
 
     access_token = await issue_token_for_user(user)
     return {"access_token": access_token, "token_type": "bearer"}
