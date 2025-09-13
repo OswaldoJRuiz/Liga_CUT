@@ -21,4 +21,4 @@ async def require_panel_access(
 
 @router.get("/dashboard", dependencies=[Depends(require_panel_access)])
 async def dashboard():
-    return {"ok": True}
+    return {"message": "Bienvenido al panel de administración"}
