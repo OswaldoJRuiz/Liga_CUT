@@ -27,6 +27,12 @@ class UserRead(BaseModel):
         # tener esta configuracion para que funcione con SQLAlchemy pero en especial para 
         # respuesta al cliente ya que se necesita la conversion de orm a json
 
+# Respuesta al registrar usuario
+"""este es un nuevo schema para poder responder con un mensaje y el usuario"""
+class RegisterResponse(BaseModel):
+    message: str
+    user: UserRead
+
 
 # Permisos
 
