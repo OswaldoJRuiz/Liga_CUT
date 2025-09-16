@@ -13,23 +13,27 @@ const RegisterSchema = z.object({
     password: z.string().min(8, "Mínimo 8 caracteres"),
 });
 type RegisterForm = z.infer<typeof RegisterSchema>;
+type RegisterResponse = {
+    message: string;
+    user: { id: number; email: string; is_active: boolean };
+};
 
 export default function RegisterForm() {
     const router = useRouter();
     const [showPwd, setShowPwd] = useState(false);
     const [err, setErr] = useState("");
+    const [ok, setOk] = useState("");
 
-    const {
-        register,
-        handleSubmit,
-        formState: { errors, isSubmitting },
-    } = useForm<RegisterForm>({ resolver: zodResolver(RegisterSchema) });
+    const { register, handleSubmit, formState: { errors, isSubmitting } } =
+        useForm<RegisterForm>({ resolver: zodResolver(RegisterSchema) });
 
     const onSubmit = async (data: RegisterForm) => {
         setErr("");
+        setOk("");
         try {
-            await api.post("/auth/register", data); // -> /panel/auth/register (por baseURL)
-            router.replace("/auth/login");
+            const res = await api.post<RegisterResponse>("/auth/register", data);
+            setOk(res.data.message || "Usuario creado exitosamente");
+            setTimeout(() => router.replace("/auth/login"), 1200);
         } catch (e: any) {
             setErr(e?.response?.data?.detail ?? "Error al registrar");
         }
@@ -68,7 +72,7 @@ export default function RegisterForm() {
                     />
                     <button
                         type="button"
-                        onClick={() => setShowPwd((s) => !s)}
+                        onClick={() => setShowPwd(s => !s)}
                         className="absolute inset-y-0 right-2 my-auto text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
                         aria-label={showPwd ? "Ocultar password" : "Mostrar password"}
                     >
@@ -78,8 +82,13 @@ export default function RegisterForm() {
                 {errors.password && <p className="text-xs text-red-600">{errors.password.message}</p>}
             </div>
 
+            {ok && (
+                <p className="text-sm text-emerald-700 border border-emerald-300 bg-emerald-50 rounded-md px-3 py-2">
+                    {ok}
+                </p>
+            )}
             {err && (
-                <p className="text-sm text-red-600 border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/30 rounded-md px-3 py-2">
+                <p className="text-sm text-red-600 border border-red-200 bg-red-50 rounded-md px-3 py-2">
                     {err}
                 </p>
             )}
