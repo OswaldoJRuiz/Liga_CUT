@@ -6,7 +6,7 @@ from auth.dependencies import get_current_user, User
 from exceptions import UserAlreadyExistsError, InvalidCredentialsError, WeakPasswordError
 
 from database.sessions import get_db
-from auth.schemas import UserCreate, UserRead, UserLogin, Token
+from auth.schemas import UserCreate, RegisterResponse, UserLogin, Token
 from auth.service import (
     get_user_by_email,
     create_user,
@@ -26,7 +26,7 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 # -----------------------------
 # Register
 # -----------------------------
-@router.post("/register", response_model=UserRead, status_code=status.HTTP_201_CREATED)
+@router.post("/register", response_model=RegisterResponse, status_code=status.HTTP_201_CREATED)
 async def register(payload: UserCreate, db: AsyncSession = Depends(get_db)):
     # verificar duplicado
     existing_user = await get_user_by_email(db, payload.email)
@@ -39,7 +39,10 @@ async def register(payload: UserCreate, db: AsyncSession = Depends(get_db)):
     except ValueError as e:
         raise WeakPasswordError(str(e))
 
-    return user
+    return {
+        "message": "Correo registrado correctamente",
+        "user": user
+    }
 
 @router.post("/login", response_model=Token)
 async def login(payload: UserLogin, db: AsyncSession = Depends(get_db)):
