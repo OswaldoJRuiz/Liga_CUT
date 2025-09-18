@@ -6,7 +6,7 @@ from auth.dependencies import get_current_user, User
 from exceptions import UserAlreadyExistsError, InvalidCredentialsError, WeakPasswordError
 
 from database.sessions import get_db
-from auth.schemas import UserCreate, RegisterResponse, UserLogin, Token
+from auth.schemas import UserCreate, RegisterResponse, UserLogin, Token, UserWithPermissions
 from auth.service import (
     get_user_by_email,
     create_user,
@@ -61,5 +61,10 @@ async def token(form_data: OAuth2PasswordRequestForm = Depends(),
     user = await authenticate_user(db, form_data.username, form_data.password)
     access = await issue_token_for_user(user)
     return {"access_token": access, "token_type": "bearer"}
+
+
+@router.get("/me", response_model=UserWithPermissions)
+async def me(current_user = Depends(get_current_user)):
+    return current_user
 
 
