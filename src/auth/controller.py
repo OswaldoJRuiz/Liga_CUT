@@ -20,7 +20,7 @@ se esta manejando desde el backend que el email sea
 en minusculas y la password tenga un minimo de 8 caracteres
 """
 
-router = APIRouter(prefix="/auth", tags=["auth"])
+router = APIRouter(prefix="/auth", tags=["Auth"])
 
 
 # -----------------------------
