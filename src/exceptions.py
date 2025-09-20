@@ -28,3 +28,20 @@ class ForbiddenError(HTTPException):
 class NotFoundError(HTTPException):
     def __init__(self, msg: str = "Not found"):
         super().__init__(status_code=status.HTTP_404_NOT_FOUND, detail=msg)
+    
+# Permisos
+class PermissionAlreadyExistsError(HTTPException):
+    def __init__(self, msg: str = "Permission already exists"):
+        super().__init__(status_code=status.HTTP_409_CONFLICT, detail=msg)
+
+class PermissionNotFoundError(HTTPException):
+    def __init__(self, msg: str = "Permission not found"):
+        super().__init__(status_code=status.HTTP_404_NOT_FOUND, detail=msg)
+
+class PermissionAssignmentError(HTTPException):
+    def __init__(self, msg: str = "Error assigning permission to user"):
+        super().__init__(status_code=status.HTTP_400_BAD_REQUEST, detail=msg)
+
+class PermissionRevocationError(HTTPException):
+    def __init__(self, msg: str = "Error revoking permission from user"):
+        super().__init__(status_code=status.HTTP_400_BAD_REQUEST, detail=msg)
