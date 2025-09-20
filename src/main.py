@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from api import register_routers
 from database.sessions import SessionLocal
-from panel.startup_seed import ensure_panel_access_seed
+from permissions.startup_seed import ensure_panel_access_seed
 from dotenv import load_dotenv
 from contextlib import asynccontextmanager
 
@@ -23,9 +23,9 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    description="Documentacion automatica de mi microservicio para la autenticacion de usuario y permisos",
-    title="Permisos_Microservicio_Por_Diego: AUTH:Service",
-    summary="Login, Register, panel de administracion de permisos"
+    description="Documentacion de mi microservicio para la autenticacion de usuario y permisos",
+    title="Permisos_Microservicio_Por_Diego: Auth: Login y register, token, hash. Permissions: CRUD de permisos. Admin: Asignacion de permisos a usuarios",
+    summary="Login, Register, panel de administracion de permisos y permisos"
 )
 
 
