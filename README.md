@@ -24,10 +24,16 @@ y Rutas para el panel de permisos
 
 # Endpoints para desarrolladores y administradores
 
-- dashboard: requiere una dependencia el cual verifica si un usuario aparece su correo como administrador de permisos para usuarios
+# Permisos
+- obtener permisos (GET): Obten un permiso de la base de datos
+- Crear Permiso (POST)
+- Obten un permiso por ID (GET)
+- Actualiza un permiso por ID (PUT) 
+- Borra permiso (DELETE)
 
-- bajo contruccion todavia... 
+# Admin
 
+- /dashboard (GET): Permiso al panel de administracion si tienes un correo valido
 
 # login y register
 
