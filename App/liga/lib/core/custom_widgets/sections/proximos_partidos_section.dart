@@ -6,17 +6,24 @@ class ProximosPartidosSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16),
+    return Padding(
+      padding: const EdgeInsets.symmetric(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(height: 16),
+          SizedBox(height: 10),
           Text(
             "Próximos partidos",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white
+                  : Colors.black, // título negro en modo claro
+            ),
           ),
-          SizedBox(height: 16),
+
+          SizedBox(height: 12), // separación entre título y tarjetas
           ProxPartidosCard(),
         ],
       ),

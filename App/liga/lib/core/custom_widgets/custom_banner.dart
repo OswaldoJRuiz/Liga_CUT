@@ -1,10 +1,15 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:liga/core/components/mixins/safestate.dart';
 
-// La verdad este banner si me dio la idea ChatGipiti pero no le digan a nadie (>'-'<) //
+class CustomBanner extends StatefulWidget {
+  const CustomBanner({super.key});
 
-class CustomBanner extends StatelessWidget {
-  CustomBanner({super.key});
+  @override
+  State<CustomBanner> createState() => _CustomBannerState();
+}
 
+class _CustomBannerState extends State<CustomBanner> with SafeState {
   final List<Map<String, String>> banners = [
     {
       "title": "Partido del fin de semana",
@@ -15,10 +20,41 @@ class CustomBanner extends StatelessWidget {
     {"title": "Noticias de la liga", "image": "assets/images/Noticias.jpg"},
   ];
 
-  final PageController _pageController = PageController(viewportFraction: 0.90);
+  late final PageController _pageController;
+  int _currentPage = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(viewportFraction: 0.90);
+
+    // Timer seguro para auto-scroll
+    final timer = Timer.periodic(const Duration(seconds: 10), (_) {
+      if (_pageController.hasClients) {
+        _currentPage++;
+        if (_currentPage >= banners.length) _currentPage = 0;
+
+        _pageController.animateToPage(
+          _currentPage,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
+
+    registerTimer(timer); // Se cancela automáticamente al hacer dispose
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose(); // timers se cancelan por el mixin
+  }
 
   @override
   Widget build(BuildContext context) {
+    final double spacing = 12;
+
     return SizedBox(
       height: 250,
       child: PageView.builder(
@@ -26,14 +62,13 @@ class CustomBanner extends StatelessWidget {
         itemCount: banners.length,
         itemBuilder: (context, index) {
           final banner = banners[index];
-          EdgeInsets margin;
-          if (index == 0) {
-            margin = const EdgeInsets.only(left: 0, right: 6);
-          } else if (index == banners.length - 1) {
-            margin = const EdgeInsets.only(left: 6, right: 0);
-          } else {
-            margin = const EdgeInsets.symmetric(horizontal: 6);
-          }
+
+          // Márgenes: sin espacio en los extremos, separación uniforme
+          EdgeInsets margin = EdgeInsets.symmetric(horizontal: spacing / 2);
+          if (index == 0) margin = EdgeInsets.only(right: spacing / 2);
+          if (index == banners.length - 1)
+            margin = EdgeInsets.only(left: spacing / 2);
+
           return Card(
             margin: margin,
             shape: RoundedRectangleBorder(

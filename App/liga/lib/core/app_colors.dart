@@ -17,3 +17,10 @@ class AppColorsDark {
   static const iconsPrimary = Color(0xFF000000);
   static const bodyText = Color(0xFFFFFFFF);
 }
+
+class DrawerColors {
+  static const Color startLight = Color(0xFFBBD5FF);
+  static const Color endLight = Color(0xFFD7EDFF);
+  static const Color startDark = Color(0xFF080D26);
+  static const Color endDark = Color(0xFF162030);
+}

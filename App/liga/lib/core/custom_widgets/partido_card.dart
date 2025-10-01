@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:liga/models/partidos_model.dart';
 import 'package:liga/screens/sub_screens/detalles_partido_screen.dart';
-
-// Aqui estan las cards de los partidos que te mandan a los detalles, un gran detalle jajaja (～￣▽￣)～ //
+import 'package:liga/core/custom_widgets/custom_card.dart';
 
 class PartidoCard extends StatelessWidget {
   final Partido partido;
@@ -11,7 +10,11 @@ class PartidoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    final theme = Theme.of(context);
+    final textColor = Colors.white; // siempre sobre el gradiente
+
+    return CustomCard(
+      withScaleAnimation: true,
       onTap: () {
         Navigator.push(
           context,
@@ -20,35 +23,51 @@ class PartidoCard extends StatelessWidget {
           ),
         );
       },
-      child: Card(
-        margin: const EdgeInsets.all(6),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        elevation: 4,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Título con equipos
+          Text(
+            "${partido.equipoA} vs ${partido.equipoB}",
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: textColor,
+              fontSize: 18,
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // Fila con fecha y hora con iconos
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                "${partido.equipoA} vs ${partido.equipoB}",
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-              ),
-              const SizedBox(height: 12),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Fecha: ${partido.fecha}"),
-                  Text("Hora: ${partido.hora}"),
+                  Icon(Icons.calendar_today, size: 16, color: textColor),
+                  const SizedBox(width: 4),
+                  Text(partido.fecha, style: TextStyle(color: textColor)),
                 ],
               ),
-              const SizedBox(height: 8),
-              Text("Lugar: ${partido.estadio}"),
+              Row(
+                children: [
+                  Icon(Icons.access_time, size: 16, color: textColor),
+                  const SizedBox(width: 4),
+                  Text(partido.hora, style: TextStyle(color: textColor)),
+                ],
+              ),
             ],
           ),
-        ),
+          const SizedBox(height: 8),
+
+          // Lugar del partido con icono
+          Row(
+            children: [
+              Icon(Icons.location_on, size: 16, color: textColor),
+              const SizedBox(width: 4),
+              Text(partido.estadio, style: TextStyle(color: textColor)),
+            ],
+          ),
+        ],
       ),
     );
   }

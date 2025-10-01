@@ -1,48 +1,68 @@
 import 'package:flutter/material.dart';
 import 'package:liga/data/partidos_data.dart';
-
-// Aqui se ve la info de los proximos partidos y ya jajajaja Y.Y //
+import 'package:liga/core/custom_widgets/custom_card.dart';
 
 class ProxPartidosCard extends StatelessWidget {
   const ProxPartidosCard({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return SizedBox(
-      height: 120,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
+      height: 190,
+      child: PageView.builder(
+        controller: PageController(viewportFraction: 0.85),
         itemCount: partidos.length,
         itemBuilder: (context, index) {
           final partido = partidos[index];
-          return Container(
-            width: 200,
-            margin: const EdgeInsets.only(right: 12),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
+
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+            child: CustomCard(
+              borderRadius: 12,
+              backgroundColor: isDark ? const Color(0xFF2C3E50) : Colors.white,
               boxShadow: const [
                 BoxShadow(
                   color: Colors.black26,
-                  blurRadius: 3,
+                  blurRadius: 4,
                   offset: Offset(0, 2),
                 ),
               ],
-              gradient: const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [Color(0xFFFF0000), Color(0xFF001EFF)],
-              ),
-            ),
-            child: Center(
-              child: Text(
-                "${partido.equipoA} vs ${partido.equipoB}\n"
-                "${partido.fecha} - ${partido.hora}\n"
-                "${partido.estadio}",
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
+              onTap: () {
+                // Acción al tocar la card
+              },
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    '${partido.equipoA} vs ${partido.equipoB}',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: Colors.white, // texto blanco siempre
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    '${partido.fecha} - ${partido.hora}',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Colors.white, // texto blanco siempre
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    partido.estadio,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: Colors.white, // texto blanco siempre
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
               ),
             ),
           );

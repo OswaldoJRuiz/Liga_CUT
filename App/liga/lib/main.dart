@@ -1,14 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:liga/animations/theme_overlay_animation.dart';
-import 'package:liga/screens/home_screen.dart';
-import 'package:liga/theme/theme_constants.dart' show darkTheme, lightTheme;
+import 'package:liga/animations/animation_presets.dart';
+import 'package:liga/notifiers/usuario_notifier.dart';
+import 'package:liga/notifiers/permisos_notifier.dart';
+import 'package:liga/theme/theme_constants.dart';
 import 'package:liga/theme/theme_manager.dart';
-
-// El main aqui es donde todo comienza y donde establezco la animacion del diablo de cambio de tema ＞﹏＜ //
+import 'package:liga/screens/home_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  print("🔹 Inicializando themeManager...");
   await themeManager.loadTheme();
+
+  print("🔹 Inicializando UsuarioNotifier...");
+  await UsuarioNotifier.init();
+
+  print("🔹 Inicializando PermisosNotifier...");
+  await PermisosNotifier.init();
+
   runApp(const MainApp());
 }
 
@@ -25,16 +34,20 @@ class _MainAppState extends State<MainApp> {
   @override
   void initState() {
     super.initState();
-    themeManager.addListener(_onThemeChange);
+    themeManager.addListener(_showQuickOverlay);
+    UsuarioNotifier.instance.addListener(_showQuickOverlay);
+    PermisosNotifier.instance.addListener(_showQuickOverlay);
   }
 
   @override
   void dispose() {
-    themeManager.removeListener(_onThemeChange);
+    themeManager.removeListener(_showQuickOverlay);
+    UsuarioNotifier.instance.removeListener(_showQuickOverlay);
+    PermisosNotifier.instance.removeListener(_showQuickOverlay);
     super.dispose();
   }
 
-  void _onThemeChange() async {
+  void _showQuickOverlay() async {
     if (!mounted) return;
     setState(() => _showOverlay = true);
     await Future.delayed(const Duration(milliseconds: 200));
@@ -49,12 +62,22 @@ class _MainAppState extends State<MainApp> {
       theme: lightTheme,
       darkTheme: darkTheme,
       themeMode: themeManager.themeMode,
-      home: Stack(
-        children: [
-          const HomeScreen(),
-          ThemeOverlayAnimation(show: _showOverlay),
-        ],
-      ),
+      builder: (context, child) {
+        return Stack(
+          children: [
+            AnimatedTheme(
+              data: themeManager.themeMode == ThemeMode.dark
+                  ? darkTheme
+                  : lightTheme,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+              child: child ?? const SizedBox(),
+            ),
+            IgnorePointer(child: presetThemeOverlay(_showOverlay)),
+          ],
+        );
+      },
+      home: const HomeScreen(),
     );
   }
 }

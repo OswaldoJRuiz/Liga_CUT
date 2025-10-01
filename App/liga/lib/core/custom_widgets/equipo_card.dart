@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:liga/core/custom_widgets/custom_card.dart';
+import 'package:liga/models/equipos_model.dart';
 
-class NoticiasCard extends StatelessWidget {
-  final String titulo;
-  final String descripcion;
+class EquipoCard extends StatelessWidget {
+  final Equipo equipo;
+  final VoidCallback? onTap;
 
-  const NoticiasCard({
-    super.key,
-    required this.titulo,
-    required this.descripcion,
-  });
+  const EquipoCard({super.key, required this.equipo, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -17,23 +14,22 @@ class NoticiasCard extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     return CustomCard(
-      withScaleAnimation: false,
+      withScaleAnimation: true,
+      onTap: onTap,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Título
           Text(
-            titulo,
+            equipo.nombre,
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
+              fontSize: 16,
               color: isDark ? Colors.white : Colors.white,
             ),
           ),
-          const SizedBox(height: 10),
-
-          // Descripción
+          const SizedBox(height: 4),
           Text(
-            descripcion,
+            "Director: ${equipo.directorTecnico}",
             style: theme.textTheme.bodyMedium?.copyWith(
               color: isDark ? Colors.white70 : Colors.white,
             ),

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:liga/core/components/filtrar_fechas.dart';
+import 'package:liga/core/custom_widgets/custom_sliver_appbar.dart';
 import 'package:liga/core/custom_widgets/partido_card.dart';
 import 'package:liga/models/partidos_model.dart';
 import 'package:liga/data/partidos_data.dart';
-
-// La Screen de partidos ya bien optimizada y con filtrador por fechas (；′⌒`) //
 
 class PartidosScreen extends StatefulWidget {
   const PartidosScreen({super.key});
@@ -23,7 +22,7 @@ class _PartidosScreenState extends State<PartidosScreen>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 250),
     );
     _controller.forward();
   }
@@ -43,12 +42,13 @@ class _PartidosScreenState extends State<PartidosScreen>
   Widget build(BuildContext context) {
     final partidosFiltrados = getPartidosFiltrados();
 
-    return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            FiltrarFechas(
+    return CustomScrollView(
+      slivers: [
+        const CustomSliverAppbar(title: "Partidos"),
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: FiltrarFechas(
               valorActual: filtro,
               partidos: partidos,
               onFiltroCambiado: (nuevoFiltro) {
@@ -59,31 +59,38 @@ class _PartidosScreenState extends State<PartidosScreen>
                 });
               },
             ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: ListView.builder(
-                itemCount: partidosFiltrados.length,
-                itemBuilder: (context, index) {
-                  final animation = Tween<double>(begin: 0, end: 1).animate(
-                    CurvedAnimation(
-                      parent: _controller,
-                      curve: Interval(
-                        index / partidosFiltrados.length,
-                        1.0,
-                        curve: Curves.easeIn,
-                      ),
-                    ),
-                  );
-                  return FadeTransition(
-                    opacity: animation,
-                    child: PartidoCard(partido: partidosFiltrados[index]),
-                  );
-                },
-              ),
-            ),
-          ],
+          ),
         ),
-      ),
+        SliverList(
+          delegate: SliverChildBuilderDelegate((context, index) {
+            final anim = CurvedAnimation(
+              parent: _controller,
+              curve: Interval(
+                index / partidosFiltrados.length,
+                1.0,
+                curve: Curves.easeInOut,
+              ),
+            );
+
+            final partido = partidosFiltrados[index];
+
+            return FadeTransition(
+              opacity: anim,
+              child: SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(0, 0.05),
+                  end: Offset.zero,
+                ).animate(anim),
+                child: ScaleTransition(
+                  scale: Tween<double>(begin: 0.995, end: 1.0).animate(anim),
+                  child: PartidoCard(partido: partido),
+                ),
+              ),
+            );
+          }, childCount: partidosFiltrados.length),
+        ),
+        const SliverToBoxAdapter(child: SizedBox(height: 32)),
+      ],
     );
   }
 }

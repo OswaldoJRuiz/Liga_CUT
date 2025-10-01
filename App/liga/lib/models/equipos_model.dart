@@ -10,6 +10,9 @@ class Equipo {
   int golesEnContra;
   int puntos;
 
+  // Nuevo campo
+  final int? propietarioId;
+
   Equipo({
     this.id,
     required this.nombre,
@@ -21,9 +24,8 @@ class Equipo {
     this.golesAFavor = 0,
     this.golesEnContra = 0,
     this.puntos = 0,
+    this.propietarioId,
   });
-
-  // Convertir a JSON (para enviar a FastAPI) //
 
   Map<String, dynamic> toJson() {
     return {
@@ -37,23 +39,23 @@ class Equipo {
       'goles_a_favor': golesAFavor,
       'goles_en_contra': golesEnContra,
       'puntos': puntos,
+      'propietario_id': propietarioId, // <-- nuevo
     };
   }
 
-  // Crear desde JSON (cuando viene del backend)
-
   factory Equipo.fromJson(Map<String, dynamic> json) {
     return Equipo(
-      id: json['id'],
-      nombre: json['nombre'],
-      directorTecnico: json['director_tecnico'],
-      partidosJugados: json['partidos_jugados'] ?? 0,
-      victorias: json['victorias'] ?? 0,
-      empates: json['empates'] ?? 0,
-      derrotas: json['derrotas'] ?? 0,
-      golesAFavor: json['goles_a_favor'] ?? 0,
-      golesEnContra: json['goles_en_contra'] ?? 0,
-      puntos: json['puntos'] ?? 0,
+      id: json['id']?.toInt(),
+      nombre: json['nombre'] ?? '',
+      directorTecnico: json['director_tecnico'] ?? '',
+      partidosJugados: (json['partidos_jugados'] ?? 0).toInt(),
+      victorias: (json['victorias'] ?? 0).toInt(),
+      empates: (json['empates'] ?? 0).toInt(),
+      derrotas: (json['derrotas'] ?? 0).toInt(),
+      golesAFavor: (json['goles_a_favor'] ?? 0).toInt(),
+      golesEnContra: (json['goles_en_contra'] ?? 0).toInt(),
+      puntos: (json['puntos'] ?? 0).toInt(),
+      propietarioId: json['propietario_id']?.toInt(), // <-- nuevo
     );
   }
 }
