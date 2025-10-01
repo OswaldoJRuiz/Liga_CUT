@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy.orm import relationship
 from .database import Base
 
 class Equipo(Base):
@@ -8,6 +9,10 @@ class Equipo(Base):
     num_jugadores = Column(Integer, nullable=False)
     logo = Column(String)
 
+    # Relación con jugadores
+    jugadores = relationship("Jugador", back_populates="equipo")
+
+
 class Jugador(Base):
     __tablename__ = "jugadores"
     id = Column(Integer, primary_key=True, index=True)
@@ -15,3 +20,7 @@ class Jugador(Base):
     posicion = Column(String, nullable=False)
     dorsal = Column(Integer, nullable=False, unique=True)
     goles = Column(Integer, default=0)
+
+    # 👇 relación con equipo
+    equipo_id = Column(Integer, ForeignKey("equipos.id"))
+    equipo = relationship("Equipo", back_populates="jugadores")

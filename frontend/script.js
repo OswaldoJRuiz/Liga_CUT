@@ -30,7 +30,7 @@ function setActiveTab(tabName) {
 document.getElementById("tabBtnJugadores").addEventListener("click", () => setActiveTab("jugadores"));
 document.getElementById("tabBtnEquipos").addEventListener("click", () => setActiveTab("equipos"));
 
-/* ============== JUGADORES ============== */
+/* ============== JUGADORES (TABLA) ============== */
 async function cargarJugadores() {
   try {
     const res = await fetch(API_JUGADORES);
@@ -59,7 +59,8 @@ document.getElementById("formJugador").addEventListener("submit", async (e) => {
     nombre: document.getElementById("nombre").value,
     posicion: document.getElementById("posicion").value,
     dorsal: parseInt(document.getElementById("dorsal").value),
-    goles: 0
+    goles: 0,
+    equipo_id: parseInt(document.getElementById("equipoJugador").value) || null // si tienes select de equipo
   };
   try {
     await fetch(API_JUGADORES, {
@@ -69,13 +70,14 @@ document.getElementById("formJugador").addEventListener("submit", async (e) => {
     });
     e.target.reset();
     cargarJugadores();
+    cargarEquiposTarjetas(); // refrescar vista de equipos
   } catch (err) {
     console.error(err);
     alert("No se pudo agregar el jugador");
   }
 });
 
-/* ============== EQUIPOS ============== */
+/* ============== EQUIPOS (TABLA) ============== */
 async function cargarEquipos() {
   try {
     const res = await fetch(API_EQUIPOS);
@@ -101,26 +103,69 @@ async function cargarEquipos() {
 
 document.getElementById("formEquipo").addEventListener("submit", async (e) => {
   e.preventDefault();
-  const equipo = {
-    id: parseInt(document.getElementById("idEquipo").value),
-    nombre: document.getElementById("nombreEquipo").value,
-    num_jugadores: parseInt(document.getElementById("numJugadores").value),
-    logo: document.getElementById("logo").value
-  };
+
+  const formData = new FormData();
+  formData.append("id", document.getElementById("idEquipo").value);
+  formData.append("nombre", document.getElementById("nombreEquipo").value);
+  formData.append("num_jugadores", document.getElementById("numJugadores").value);
+  formData.append("logo", document.getElementById("logo").files[0]); 
+
   try {
     await fetch(API_EQUIPOS, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(equipo)
+      body: formData
     });
     e.target.reset();
     cargarEquipos();
+    cargarEquiposTarjetas(); // refrescar vista de equipos
   } catch (err) {
     console.error(err);
     alert("No se pudo agregar el equipo");
   }
 });
 
-setActiveTab("jugadores"); // pestaña inicial
+/* ============== EQUIPOS (TARJETAS CON JUGADORES) ============== */
+async function cargarEquiposTarjetas() {
+  try {
+    const resEquipos = await fetch(API_EQUIPOS);
+    const equipos = await resEquipos.json();
+
+    const resJugadores = await fetch(API_JUGADORES);
+    const jugadores = await resJugadores.json();
+
+    const container = document.getElementById("equiposContainer");
+    if (!container) return; // por si no existe en esta página
+
+    container.innerHTML = "";
+
+    equipos.forEach(eq => {
+      const jugadoresEquipo = jugadores.filter(j => j.equipo_id === eq.id);
+
+      const jugadoresHtml = jugadoresEquipo.map(j =>
+        `<li class="text-sm">${j.nombre} - ${j.posicion} (#${j.dorsal})</li>`
+      ).join("");
+
+      container.innerHTML += `
+        <div onclick="verEquipo(${eq.id})"
+          class="bg-[#1e293b] rounded-xl shadow-lg p-6 cursor-pointer hover:scale-105 transition">
+          <img src="${eq.logo}" alt="Logo" class="w-20 h-20 mx-auto mb-4 rounded-full object-contain">
+          <h2 class="text-xl font-semibold text-center mb-2">${eq.nombre}</h2>
+          <ul class="text-center space-y-1">${jugadoresHtml || "<li>Sin jugadores</li>"}</ul>
+        </div>
+      `;
+    });
+  } catch (err) {
+    console.error(err);
+    alert("No se pudo cargar las tarjetas de equipos");
+  }
+}
+
+function verEquipo(id) {
+  window.location.href = `equipo_detalle.html?id=${id}`;
+}
+
+/* ============== INICIAL ============== */
+setActiveTab("jugadores"); 
 cargarJugadores();
 cargarEquipos();
+cargarEquiposTarjetas();

@@ -14,6 +14,7 @@ class Jugador(BaseModel):
     posicion: str
     dorsal: int
     goles: int = 0
+    equipo_id: int
     class Config:
         from_attributes = True
 

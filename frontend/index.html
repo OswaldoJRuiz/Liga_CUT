@@ -17,26 +17,25 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
         </svg>
       </button>
-      <!-- Menú desplegable -->
-      <div id="menu" class="hidden absolute mt-7 w-42 bg-[#1e293b] rounded-2xl shadow-lg z-10">
-        <a href="#" class="block px-4 py-2 text-[#e2e8f0] hover:bg-[#22c55e]/20">Calendario</a>
-        <a href="#" class="block px-4 py-2 text-[#e2e8f0] hover:bg-[#22c55e]/20">Inicio</a>
-        <a href="#" class="block px-4 py-2 text-[#e2e8f0] hover:bg-[#22c55e]/20">Conócenos</a>
-      </div>
+     <!-- menu -->
+<div id="menu" class="hidden absolute mt-7 w-42 bg-[#1e293b] rounded-2xl shadow-lg z-10">
+  <a href="calendario.html" class="block px-4 py-2 text-[#e2e8f0] hover:bg-[#22c55e]/20">Calendario</a>
+  <a href="inicio.html" class="block px-4 py-2 text-[#e2e8f0] hover:bg-[#22c55e]/20">Inicio</a>
+  <a href="conocenos.html" class="block px-4 py-2 text-[#e2e8f0] hover:bg-[#22c55e]/20">Conócenos</a>
+  <a href="equipos.html" class="block px-4 py-2 text-[#e2e8f0] hover:bg-[#22c55e]/20">Equipos Registrados</a>
+</div>
+
     </div>
 
-    <!-- Logo UDG más grande -->
     <div>
       <img src="assets/cut.png" alt="Logo UDG" class="h-16">
     </div>
   </nav>
 
-  <!-- Título principal -->
   <h1 class="text-5xl md:text-6xl font-extrabold text-center mb-12 text-white drop-shadow-lg">
     Liga CUT Tonalá
   </h1>
 
-  <!-- Pestañas -->
   <div class="max-w-4xl mx-auto flex justify-center gap-4 mb-8">
   <button id="tabBtnJugadores" data-tab="jugadores"
           class="px-6 py-2 rounded-full font-semibold bg-gradient-to-r from-[#22c55e] to-[#3b82f6] text-white  hover:scale-105 transition-transform duration-300">
@@ -94,7 +93,9 @@
         <input type="number" id="idEquipo" placeholder="ID Equipo" class="w-full bg-[#0f172a] border border-[#3b82f6]/40 rounded-xl p-3 text-[#e2e8f0] placeholder-[#cbd5e1] focus:outline-none focus:ring-2 focus:ring-[#3b82f6]"/>
         <input type="text" id="nombreEquipo" placeholder="Nombre del Equipo" class="w-full bg-[#0f172a] border border-[#3b82f6]/40 rounded-xl p-3 text-[#e2e8f0] placeholder-[#cbd5e1] focus:outline-none focus:ring-2 focus:ring-[#3b82f6]"/>
         <input type="number" id="numJugadores" placeholder="Número de Jugadores" class="w-full bg-[#0f172a] border border-[#3b82f6]/40 rounded-xl p-3 text-[#e2e8f0] placeholder-[#cbd5e1] focus:outline-none focus:ring-2 focus:ring-[#3b82f6]"/>
-        <input type="text" id="logo" placeholder="URL del Logo" class="w-full bg-[#0f172a] border border-[#3b82f6]/40 rounded-xl p-3 text-[#e2e8f0] placeholder-[#cbd5e1] focus:outline-none focus:ring-2 focus:ring-[#3b82f6]"/>
+        <input type="file" id="logo" accept="image/*" 
+        class="w-full bg-[#0f172a] border border-[#3b82f6]/40 rounded-xl p-3 text-[#e2e8f0] placeholder-[#cbd5e1] focus:outline-none focus:ring-2 focus:ring-[#3b82f6]"/>
+
         <button type="submit" class="w-full bg-gradient-to-r from-[#22c55e] to-[#3b82f6] p-3 rounded-xl font-semibold shadow-lg text-white hover:opacity-90 transition-all">
           Agregar Equipo
         </button>
@@ -121,7 +122,7 @@
 
   <!-- Scripts -->
   <script>
-    // Menú hamburguesa
+    //  hamburguesa
     document.getElementById('menuBtn').addEventListener('click', () => {
       document.getElementById('menu').classList.toggle('hidden');
     });

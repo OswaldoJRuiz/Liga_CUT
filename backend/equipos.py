@@ -1,6 +1,8 @@
-from fastapi import APIRouter, HTTPException, Depends
+import os
+import shutil
+from fastapi import APIRouter, HTTPException, Depends, UploadFile, File, Form
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 from sqlalchemy.orm import Session
 
 from backend.database import SessionLocal
@@ -8,12 +10,16 @@ from backend.models import Equipo as EquipoDB
 
 router = APIRouter()
 
-# Modelo Pydantic para validación
+# Carpeta donde guardaremos los logos
+UPLOAD_DIR = "static/logos"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+# Modelo Pydantic para respuestas
 class Equipo(BaseModel):
     id: int
     nombre: str
     num_jugadores: int
-    logo: str
+    logo: Optional[str]  # puede ser None si no sube imagen
 
     class Config:
         from_attributes = True
@@ -39,15 +45,37 @@ def obtener_equipo(equipo_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Equipo no encontrado")
     return equipo
 
-# Agregar equipo
+# Agregar equipo con imagen
 @router.post("/", response_model=Equipo)
-def agregar_equipo(equipo: Equipo, db: Session = Depends(get_db)):
+def agregar_equipo(
+    id: int = Form(...),
+    nombre: str = Form(...),
+    num_jugadores: int = Form(...),
+    logo: UploadFile = File(None),  # logo puede ser opcional
+    db: Session = Depends(get_db)
+):
+    # Validar si ya existe
     existente = db.query(EquipoDB).filter(
-        (EquipoDB.id == equipo.id) | (EquipoDB.nombre == equipo.nombre)
+        (EquipoDB.id == id) | (EquipoDB.nombre == nombre)
     ).first()
     if existente:
         raise HTTPException(status_code=400, detail="ID o nombre ya existe")
-    nuevo = EquipoDB(**equipo.dict())
+
+    logo_path = None
+    if logo:
+        ext = logo.filename.split(".")[-1]
+        filename = f"equipo_{id}.{ext}"
+        file_path = os.path.join(UPLOAD_DIR, filename)
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(logo.file, buffer)
+        logo_path = f"/{UPLOAD_DIR}/{filename}"  # ruta accesible
+
+    nuevo = EquipoDB(
+        id=id,
+        nombre=nombre,
+        num_jugadores=num_jugadores,
+        logo=logo_path
+    )
     db.add(nuevo)
     db.commit()
     db.refresh(nuevo)
@@ -55,12 +83,28 @@ def agregar_equipo(equipo: Equipo, db: Session = Depends(get_db)):
 
 # Actualizar equipo
 @router.put("/{equipo_id}", response_model=Equipo)
-def actualizar_equipo(equipo_id: int, datos: Equipo, db: Session = Depends(get_db)):
+def actualizar_equipo(
+    equipo_id: int,
+    nombre: str = Form(...),
+    num_jugadores: int = Form(...),
+    logo: UploadFile = File(None),
+    db: Session = Depends(get_db)
+):
     equipo = db.query(EquipoDB).filter(EquipoDB.id == equipo_id).first()
     if not equipo:
         raise HTTPException(status_code=404, detail="Equipo no encontrado")
-    for key, value in datos.dict().items():
-        setattr(equipo, key, value)
+
+    equipo.nombre = nombre
+    equipo.num_jugadores = num_jugadores
+
+    if logo:
+        ext = logo.filename.split(".")[-1]
+        filename = f"equipo_{equipo_id}.{ext}"
+        file_path = os.path.join(UPLOAD_DIR, filename)
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(logo.file, buffer)
+        equipo.logo = f"/{UPLOAD_DIR}/{filename}"
+
     db.commit()
     db.refresh(equipo)
     return equipo
@@ -71,6 +115,14 @@ def eliminar_equipo(equipo_id: int, db: Session = Depends(get_db)):
     equipo = db.query(EquipoDB).filter(EquipoDB.id == equipo_id).first()
     if not equipo:
         raise HTTPException(status_code=404, detail="Equipo no encontrado")
+
+    # Eliminar logo físico si existe
+    if equipo.logo:
+        try:
+            os.remove(equipo.logo.lstrip("/"))
+        except FileNotFoundError:
+            pass
+
     db.delete(equipo)
     db.commit()
     return {"message": "Equipo Eliminado"}
