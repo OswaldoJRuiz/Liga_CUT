@@ -1,171 +1,155 @@
-// URL de los backends
-const API_JUGADORES = "http://127.0.0.1:8000/jugadores";
-const API_EQUIPOS   = "http://127.0.0.1:8000/equipos";
+const API_URL = "http://127.0.0.1:8000";
 
-/* ============== TABS ============== */
-function setActiveTab(tabName) {
-  const btnJug = document.getElementById("tabBtnJugadores");
-  const btnEqp = document.getElementById("tabBtnEquipos");
-  const secJug = document.getElementById("tab-jugadores");
-  const secEqp = document.getElementById("tab-equipos");
+// ==================== EQUIPOS ====================
+document.getElementById("formEquipo").addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-  const activeClasses = "font-semibold border-blue-500 text-blue-700";
-  const inactiveClasses = "font-normal text-gray-600";
+  const equipo = {
+    id: parseInt(document.getElementById("idEquipo").value),
+    nombre: document.getElementById("nombreEquipo").value,
+    num_jugadores: parseInt(document.getElementById("numJugadores").value)
+  };
 
-  if (tabName === "jugadores") {
-    secJug.classList.remove("hidden");
-    secEqp.classList.add("hidden");
-    btnJug.classList.add(...activeClasses.split(" "));
-    btnEqp.classList.remove(...activeClasses.split(" "));
-    btnEqp.classList.add(...inactiveClasses.split(" "));
-  } else {
-    secEqp.classList.remove("hidden");
-    secJug.classList.add("hidden");
-    btnEqp.classList.add(...activeClasses.split(" "));
-    btnJug.classList.remove(...activeClasses.split(" "));
-    btnJug.classList.add(...inactiveClasses.split(" "));
-  }
-}
+  console.log("📤 Enviando equipo:", equipo);
 
-document.getElementById("tabBtnJugadores").addEventListener("click", () => setActiveTab("jugadores"));
-document.getElementById("tabBtnEquipos").addEventListener("click", () => setActiveTab("equipos"));
-
-/* ============== JUGADORES (TABLA) ============== */
-async function cargarJugadores() {
   try {
-    const res = await fetch(API_JUGADORES);
-    const data = await res.json();
-    const tabla = document.getElementById("tablaJugadores");
-    tabla.innerHTML = "";
-    data.forEach(j => {
-      tabla.innerHTML += `
-        <tr class="border-b">
-          <td class="p-2">${j.id}</td>
-          <td class="p-2">${j.nombre}</td>
-          <td class="p-2">${j.posicion}</td>
-          <td class="p-2">${j.dorsal}</td>
-        </tr>`;
+    const res = await fetch(`${API_URL}/equipos`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(equipo)
     });
-  } catch (e) {
-    console.error(e);
-    alert("No se pudo cargar la lista de jugadores");
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(`Error ${res.status}: ${errorData.detail}`);
+    }
+
+    const equipoCreado = await res.json();
+    console.log(" Equipo agregado:", equipoCreado);
+    
+    e.target.reset();
+    await cargarEquipos();
+    alert(" Equipo agregado correctamente");
+
+  } catch (err) {
+    console.error(" Error al agregar equipo:", err);
+    alert("No se pudo agregar el equipo: " + err.message);
+  }
+});
+
+async function cargarEquipos() {
+  try {
+    const res = await fetch(`${API_URL}/equipos`);
+    
+    if (!res.ok) {
+      throw new Error(`Error ${res.status} al cargar equipos`);
+    }
+    
+    const equipos = await res.json();
+    const tbody = document.getElementById("tablaEquipos");
+    tbody.innerHTML = "";
+
+    if (equipos.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="4" class="p-3 text-center">No hay equipos registrados</td></tr>`;
+      return;
+    }
+
+    equipos.forEach(eq => {
+      const fila = document.createElement("tr");
+      fila.innerHTML = `
+        <td class="p-3 border-b border-[#3b82f6]/30">${eq.id}</td>
+        <td class="p-3 border-b border-[#3b82f6]/30 font-semibold">${eq.nombre}</td>
+        <td class="p-3 border-b border-[#3b82f6]/30">${eq.num_jugadores}</td>
+        <td class="p-3 border-b border-[#3b82f6]/30">Sin logo</td>
+      `;
+      tbody.appendChild(fila);
+    });
+  } catch (err) {
+    console.error("⚠️ Error al cargar equipos:", err);
+    const tbody = document.getElementById("tablaEquipos");
+    tbody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-red-400">Error al cargar equipos: ${err.message}</td></tr>`;
   }
 }
 
+// ==================== JUGADORES ====================
 document.getElementById("formJugador").addEventListener("submit", async (e) => {
   e.preventDefault();
+
   const jugador = {
     id: parseInt(document.getElementById("id").value),
     nombre: document.getElementById("nombre").value,
     posicion: document.getElementById("posicion").value,
     dorsal: parseInt(document.getElementById("dorsal").value),
-    goles: 0,
-    equipo_id: parseInt(document.getElementById("equipoJugador").value) || null // si tienes select de equipo
+    goles: parseInt(document.getElementById("goles").value) || 0,
+    equipo_id: parseInt(document.getElementById("equipo_id").value)
   };
+
+  console.log("📤 Enviando jugador:", jugador);
+
   try {
-    await fetch(API_JUGADORES, {
+    const res = await fetch(`${API_URL}/jugadores`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(jugador)
     });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(`Error ${res.status}: ${errorData.detail}`);
+    }
+
+    const jugadorCreado = await res.json();
+    console.log(" Jugador agregado:", jugadorCreado);
+
     e.target.reset();
-    cargarJugadores();
-    cargarEquiposTarjetas(); // refrescar vista de equipos
+    await cargarJugadores();
+    alert(" Jugador agregado correctamente");
+
   } catch (err) {
-    console.error(err);
-    alert("No se pudo agregar el jugador");
+    console.error(" No se pudo agregar el jugador:", err);
+    alert("No se pudo agregar el jugador: " + err.message);
   }
 });
 
-/* ============== EQUIPOS (TABLA) ============== */
-async function cargarEquipos() {
+async function cargarJugadores() {
   try {
-    const res = await fetch(API_EQUIPOS);
-    const data = await res.json();
-    const tabla = document.getElementById("tablaEquipos");
-    tabla.innerHTML = "";
-    data.forEach(eq => {
-      tabla.innerHTML += `
-        <tr class="border-b">
-          <td class="p-2">${eq.id}</td>
-          <td class="p-2">${eq.nombre}</td>
-          <td class="p-2">${eq.num_jugadores}</td>
-          <td class="p-2">
-            ${eq.logo ? `<img src="${eq.logo}" alt="logo" class="w-12 h-12 object-contain">` : "-"}
-          </td>
-        </tr>`;
-    });
-  } catch (e) {
-    console.error(e);
-    alert("No se pudo cargar la lista de equipos");
-  }
-}
+    const res = await fetch(`${API_URL}/jugadores`);
+    
+    if (!res.ok) {
+      throw new Error(`Error ${res.status} al cargar jugadores`);
+    }
+    
+    const jugadores = await res.json();
+    const tbody = document.getElementById("tablaJugadores");
+    tbody.innerHTML = "";
 
-document.getElementById("formEquipo").addEventListener("submit", async (e) => {
-  e.preventDefault();
+    if (jugadores.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="6" class="p-3 text-center">No hay jugadores registrados</td></tr>`;
+      return;
+    }
 
-  const formData = new FormData();
-  formData.append("id", document.getElementById("idEquipo").value);
-  formData.append("nombre", document.getElementById("nombreEquipo").value);
-  formData.append("num_jugadores", document.getElementById("numJugadores").value);
-  formData.append("logo", document.getElementById("logo").files[0]); 
-
-  try {
-    await fetch(API_EQUIPOS, {
-      method: "POST",
-      body: formData
-    });
-    e.target.reset();
-    cargarEquipos();
-    cargarEquiposTarjetas(); // refrescar vista de equipos
-  } catch (err) {
-    console.error(err);
-    alert("No se pudo agregar el equipo");
-  }
-});
-
-/* ============== EQUIPOS (TARJETAS CON JUGADORES) ============== */
-async function cargarEquiposTarjetas() {
-  try {
-    const resEquipos = await fetch(API_EQUIPOS);
-    const equipos = await resEquipos.json();
-
-    const resJugadores = await fetch(API_JUGADORES);
-    const jugadores = await resJugadores.json();
-
-    const container = document.getElementById("equiposContainer");
-    if (!container) return; // por si no existe en esta página
-
-    container.innerHTML = "";
-
-    equipos.forEach(eq => {
-      const jugadoresEquipo = jugadores.filter(j => j.equipo_id === eq.id);
-
-      const jugadoresHtml = jugadoresEquipo.map(j =>
-        `<li class="text-sm">${j.nombre} - ${j.posicion} (#${j.dorsal})</li>`
-      ).join("");
-
-      container.innerHTML += `
-        <div onclick="verEquipo(${eq.id})"
-          class="bg-[#1e293b] rounded-xl shadow-lg p-6 cursor-pointer hover:scale-105 transition">
-          <img src="${eq.logo}" alt="Logo" class="w-20 h-20 mx-auto mb-4 rounded-full object-contain">
-          <h2 class="text-xl font-semibold text-center mb-2">${eq.nombre}</h2>
-          <ul class="text-center space-y-1">${jugadoresHtml || "<li>Sin jugadores</li>"}</ul>
-        </div>
+    jugadores.forEach(j => {
+      const fila = document.createElement("tr");
+      fila.innerHTML = `
+        <td class="p-3 border-b border-[#3b82f6]/30">${j.id}</td>
+        <td class="p-3 border-b border-[#3b82f6]/30">${j.nombre}</td>
+        <td class="p-3 border-b border-[#3b82f6]/30">${j.posicion}</td>
+        <td class="p-3 border-b border-[#3b82f6]/30">${j.dorsal}</td>
+        <td class="p-3 border-b border-[#3b82f6]/30">${j.goles}</td>
+        <td class="p-3 border-b border-[#3b82f6]/30">${j.equipo_id}</td>
       `;
+      tbody.appendChild(fila);
     });
   } catch (err) {
-    console.error(err);
-    alert("No se pudo cargar las tarjetas de equipos");
+    console.error(" Error al cargar jugadores:", err);
+    const tbody = document.getElementById("tablaJugadores");
+    tbody.innerHTML = `<tr><td colspan="6" class="p-3 text-center text-red-400">Error al cargar jugadores: ${err.message}</td></tr>`;
   }
 }
 
-function verEquipo(id) {
-  window.location.href = `equipo_detalle.html?id=${id}`;
-}
-
-/* ============== INICIAL ============== */
-setActiveTab("jugadores"); 
-cargarJugadores();
-cargarEquipos();
-cargarEquiposTarjetas();
+// ==================== CARGA INICIAL ====================
+document.addEventListener('DOMContentLoaded', () => {
+  console.log(" Cargando datos iniciales...");
+  cargarEquipos();
+  cargarJugadores();
+});

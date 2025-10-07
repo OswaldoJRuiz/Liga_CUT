@@ -17,14 +17,13 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
         </svg>
       </button>
-     <!-- menu -->
-<div id="menu" class="hidden absolute mt-7 w-42 bg-[#1e293b] rounded-2xl shadow-lg z-10">
-  <a href="calendario.html" class="block px-4 py-2 text-[#e2e8f0] hover:bg-[#22c55e]/20">Calendario</a>
-  <a href="inicio.html" class="block px-4 py-2 text-[#e2e8f0] hover:bg-[#22c55e]/20">Inicio</a>
-  <a href="conocenos.html" class="block px-4 py-2 text-[#e2e8f0] hover:bg-[#22c55e]/20">Conócenos</a>
-  <a href="equipos.html" class="block px-4 py-2 text-[#e2e8f0] hover:bg-[#22c55e]/20">Equipos Registrados</a>
-</div>
-
+      <!-- menu -->
+      <div id="menu" class="hidden absolute mt-7 w-42 bg-[#1e293b] rounded-2xl shadow-lg z-10">
+        <a href="calendario.html" class="block px-4 py-2 text-[#e2e8f0] hover:bg-[#22c55e]/20">Calendario</a>
+        <a href="inicio.html" class="block px-4 py-2 text-[#e2e8f0] hover:bg-[#22c55e]/20">Inicio</a>
+        <a href="conocenos.html" class="block px-4 py-2 text-[#e2e8f0] hover:bg-[#22c55e]/20">Conócenos</a>
+        <a href="equipos.html" class="block px-4 py-2 text-[#e2e8f0] hover:bg-[#22c55e]/20">Equipos Registrados</a>
+      </div>
     </div>
 
     <div>
@@ -37,30 +36,31 @@
   </h1>
 
   <div class="max-w-4xl mx-auto flex justify-center gap-4 mb-8">
-  <button id="tabBtnJugadores" data-tab="jugadores"
-          class="px-6 py-2 rounded-full font-semibold bg-gradient-to-r from-[#22c55e] to-[#3b82f6] text-white  hover:scale-105 transition-transform duration-300">
-    Jugadores
-  </button>
-  <button id="tabBtnEquipos" data-tab="equipos"
-          class="px-6 py-2 rounded-full font-semibold bg-gradient-to-r from-[#3b82f6] to-[#22c55e] text-white shadow-lg hover:scale-105 transition-transform duration-300">
-    Equipos
-  </button>
-</div>
+    <button id="tabBtnJugadores" data-tab="jugadores"
+            class="px-6 py-2 rounded-full font-semibold bg-gradient-to-r from-[#22c55e] to-[#3b82f6] text-white hover:scale-105 transition-transform duration-300">
+      Jugadores
+    </button>
+    <button id="tabBtnEquipos" data-tab="equipos"
+            class="px-6 py-2 rounded-full font-semibold bg-gradient-to-r from-[#3b82f6] to-[#22c55e] text-white shadow-lg hover:scale-105 transition-transform duration-300">
+      Equipos
+    </button>
+  </div>
 
-
-  <!-- Contenido: Jugadores -->
+  <!-- =================== JUGADORES =================== -->
   <section id="tab-jugadores">
     <div class="max-w-lg mx-auto bg-[#1e293b] p-6 rounded-2xl shadow-lg mb-8 hover:scale-105 transition-transform duration-300">
-      <h2 class="text-2xl font-semibold mb-4 text-white ">
+      <h2 class="text-2xl font-semibold mb-4 text-white">
         Agregar Jugador
       </h2>
       <form id="formJugador" class="space-y-3">
-        <input type="number" id="id" placeholder="ID" class="w-full bg-[#0f172a] border border-[#3b82f6]/40 rounded-xl p-3 text-[#e2e8f0] placeholder-[#cbd5e1] focus:outline-none focus:ring-2 focus:ring-[#3b82f6]"/>
-        <input type="text" id="nombre" placeholder="Nombre" class="w-full bg-[#0f172a] border border-[#3b82f6]/40 rounded-xl p-3 text-[#e2e8f0] placeholder-[#cbd5e1] focus:outline-none focus:ring-2 focus:ring-[#3b82f6]"/>
-        <input type="text" id="posicion" placeholder="Posición" class="w-full bg-[#0f172a] border border-[#3b82f6]/40 rounded-xl p-3 text-[#e2e8f0] placeholder-[#cbd5e1] focus:outline-none focus:ring-2 focus:ring-[#3b82f6]"/>
-        <input type="number" id="dorsal" placeholder="Dorsal" class="w-full bg-[#0f172a] border border-[#3b82f6]/40 rounded-xl p-3 text-[#e2e8f0] placeholder-[#cbd5e1] focus:outline-none focus:ring-2 focus:ring-[#3b82f6]"/>
+        <input type="number" id="id" placeholder="ID" class="w-full bg-[#0f172a] border border-[#3b82f6]/40 rounded-xl p-3 text-[#e2e8f0] placeholder-[#cbd5e1] focus:outline-none focus:ring-2 focus:ring-[#3b82f6]" required>
+        <input type="text" id="nombre" placeholder="Nombre" class="w-full bg-[#0f172a] border border-[#3b82f6]/40 rounded-xl p-3 text-[#e2e8f0] placeholder-[#cbd5e1] focus:outline-none focus:ring-2 focus:ring-[#3b82f6]" required>
+        <input type="text" id="posicion" placeholder="Posición" class="w-full bg-[#0f172a] border border-[#3b82f6]/40 rounded-xl p-3 text-[#e2e8f0] placeholder-[#cbd5e1] focus:outline-none focus:ring-2 focus:ring-[#3b82f6]" required>
+        <input type="number" id="dorsal" placeholder="Dorsal" class="w-full bg-[#0f172a] border border-[#3b82f6]/40 rounded-xl p-3 text-[#e2e8f0] placeholder-[#cbd5e1] focus:outline-none focus:ring-2 focus:ring-[#3b82f6]" required>
+        <input type="number" id="goles" placeholder="Goles" value="0" min="0" class="w-full bg-[#0f172a] border border-[#3b82f6]/40 rounded-xl p-3 text-[#e2e8f0] placeholder-[#cbd5e1] focus:outline-none focus:ring-2 focus:ring-[#3b82f6]">
+        <input type="number" id="equipo_id" placeholder="ID del equipo" class="w-full bg-[#0f172a] border border-[#3b82f6]/40 rounded-xl p-3 text-[#e2e8f0] placeholder-[#cbd5e1] focus:outline-none focus:ring-2 focus:ring-[#3b82f6]" required>
         <button type="submit" class="w-full bg-gradient-to-r from-[#22c55e] to-[#3b82f6] p-3 rounded-xl font-semibold shadow-lg text-white hover:opacity-90 transition-all">
-          Agregar
+          Agregar Jugador
         </button>
       </form>
     </div>
@@ -76,6 +76,8 @@
             <th class="p-3 border-b border-[#3b82f6]/50">Nombre</th>
             <th class="p-3 border-b border-[#3b82f6]/50">Posición</th>
             <th class="p-3 border-b border-[#3b82f6]/50">Dorsal</th>
+            <th class="p-3 border-b border-[#3b82f6]/50">Goles</th>
+            <th class="p-3 border-b border-[#3b82f6]/50">Equipo ID</th>
           </tr>
         </thead>
         <tbody id="tablaJugadores"></tbody>
@@ -83,18 +85,17 @@
     </div>
   </section>
 
-  <!-- Contenido: Equipos -->
+  <!-- =================== EQUIPOS =================== -->
   <section id="tab-equipos" class="hidden">
     <div class="max-w-lg mx-auto bg-[#1e293b] p-6 rounded-2xl shadow-lg mb-8">
       <h2 class="text-2xl font-semibold mb-4 text-white">
         Agregar Equipo
       </h2>
       <form id="formEquipo" class="space-y-3">
-        <input type="number" id="idEquipo" placeholder="ID Equipo" class="w-full bg-[#0f172a] border border-[#3b82f6]/40 rounded-xl p-3 text-[#e2e8f0] placeholder-[#cbd5e1] focus:outline-none focus:ring-2 focus:ring-[#3b82f6]"/>
-        <input type="text" id="nombreEquipo" placeholder="Nombre del Equipo" class="w-full bg-[#0f172a] border border-[#3b82f6]/40 rounded-xl p-3 text-[#e2e8f0] placeholder-[#cbd5e1] focus:outline-none focus:ring-2 focus:ring-[#3b82f6]"/>
-        <input type="number" id="numJugadores" placeholder="Número de Jugadores" class="w-full bg-[#0f172a] border border-[#3b82f6]/40 rounded-xl p-3 text-[#e2e8f0] placeholder-[#cbd5e1] focus:outline-none focus:ring-2 focus:ring-[#3b82f6]"/>
-        <input type="file" id="logo" accept="image/*" 
-        class="w-full bg-[#0f172a] border border-[#3b82f6]/40 rounded-xl p-3 text-[#e2e8f0] placeholder-[#cbd5e1] focus:outline-none focus:ring-2 focus:ring-[#3b82f6]"/>
+        <input type="number" id="idEquipo" placeholder="ID Equipo" class="w-full bg-[#0f172a] border border-[#3b82f6]/40 rounded-xl p-3 text-[#e2e8f0] placeholder-[#cbd5e1] focus:outline-none focus:ring-2 focus:ring-[#3b82f6]" required>
+        <input type="text" id="nombreEquipo" placeholder="Nombre del Equipo" class="w-full bg-[#0f172a] border border-[#3b82f6]/40 rounded-xl p-3 text-[#e2e8f0] placeholder-[#cbd5e1] focus:outline-none focus:ring-2 focus:ring-[#3b82f6]" required>
+        <input type="number" id="numJugadores" placeholder="Número de Jugadores" class="w-full bg-[#0f172a] border border-[#3b82f6]/40 rounded-xl p-3 text-[#e2e8f0] placeholder-[#cbd5e1] focus:outline-none focus:ring-2 focus:ring-[#3b82f6]" required>
+        <input type="file" id="logo" accept="image/*" class="w-full bg-[#0f172a] border border-[#3b82f6]/40 rounded-xl p-3 text-[#e2e8f0] focus:outline-none focus:ring-2 focus:ring-[#3b82f6]">
 
         <button type="submit" class="w-full bg-gradient-to-r from-[#22c55e] to-[#3b82f6] p-3 rounded-xl font-semibold shadow-lg text-white hover:opacity-90 transition-all">
           Agregar Equipo
@@ -122,7 +123,7 @@
 
   <!-- Scripts -->
   <script>
-    //  hamburguesa
+    // Menú hamburguesa
     document.getElementById('menuBtn').addEventListener('click', () => {
       document.getElementById('menu').classList.toggle('hidden');
     });
