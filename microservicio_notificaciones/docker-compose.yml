@@ -1,0 +1,13 @@
+version: "3.9"
+
+services:
+  notificaciones:
+    build: .
+    container_name: microservicio_notificaciones
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./microservicio_notificaciones/backend:/app/backend
+    environment:
+      - ENV=produccion
+      - DEBUG=False
