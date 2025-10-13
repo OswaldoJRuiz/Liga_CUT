@@ -1,90 +1,86 @@
 package com.proyecto.Liga_CUT.servicio;
 
+import com.proyecto.Liga_CUT.cliente.EquipoServiceCliente; 
+import com.proyecto.Liga_CUT.dto.EquipoDTO;
 import com.proyecto.Liga_CUT.dto.PosicionDTO;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.Query;
+import com.proyecto.Liga_CUT.modelo.Partido;
+import com.proyecto.Liga_CUT.repositorio.PartidoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class ServicioTabla {
 
-    private final EntityManager em;
+    private final PartidoRepository partidoRepository;
+    private final EquipoServiceCliente equipoServiceCliente;
 
-    public ServicioTabla(EntityManager em) {
-        this.em = em;
+    public ServicioTabla(PartidoRepository partidoRepository, EquipoServiceCliente equipoServiceCliente) {
+        this.partidoRepository = partidoRepository;
+        this.equipoServiceCliente = equipoServiceCliente;
     }
 
     @Transactional(readOnly = true)
     public List<PosicionDTO> obtenerTabla() {
-        String sql = 
-            "SELECT t.id_equipo, t.nombre, " +
-            "COALESCE(SUM(s.pj),0) AS partidos_jugados, " +
-            "COALESCE(SUM(s.g),0) AS ganados, " +
-            "COALESCE(SUM(s.e),0) AS empatados, " +
-            "COALESCE(SUM(s.p),0) AS perdidos, " +
-            "COALESCE(SUM(s.gf),0) AS goles_favor, " +
-            "COALESCE(SUM(s.ga),0) AS goles_contra, " +
-            "(COALESCE(SUM(s.gf),0) - COALESCE(SUM(s.ga),0)) AS diferencia_goles, " +
-            "COALESCE(SUM(s.pts),0) AS puntos " +
-            "FROM ( " +
-            "  SELECT p.id_equipo_local AS id_equipo, 1 AS pj, " +
-            "    CASE WHEN p.goles_local > p.goles_visitante THEN 1 ELSE 0 END AS g, " +
-            "    CASE WHEN p.goles_local = p.goles_visitante THEN 1 ELSE 0 END AS e, " +
-            "    CASE WHEN p.goles_local < p.goles_visitante THEN 1 ELSE 0 END AS p, " +
-            "    p.goles_local AS gf, p.goles_visitante AS ga, " +
-            "    CASE WHEN p.goles_local > p.goles_visitante THEN 3 WHEN p.goles_local = p.goles_visitante THEN 1 ELSE 0 END AS pts " +
-            "  FROM partido p WHERE p.estado = 'finalizado' " +
-            "  UNION ALL " +
-            "  SELECT p.id_equipo_visitante AS id_equipo, 1 AS pj, " +
-            "    CASE WHEN p.goles_visitante > p.goles_local THEN 1 ELSE 0 END AS g, " +
-            "    CASE WHEN p.goles_visitante = p.goles_local THEN 1 ELSE 0 END AS e, " +
-            "    CASE WHEN p.goles_visitante < p.goles_local THEN 1 ELSE 0 END AS p, " +
-            "    p.goles_visitante AS gf, p.goles_local AS ga, " +
-            "    CASE WHEN p.goles_visitante > p.goles_local THEN 3 WHEN p.goles_visitante = p.goles_local THEN 1 ELSE 0 END AS pts " +
-            "  FROM partido p WHERE p.estado = 'finalizado' " +
-            ") s " +
-            "RIGHT JOIN equipo t ON t.id_equipo = s.id_equipo " +
-            "GROUP BY t.id_equipo, t.nombre";
+        List<EquipoDTO> todosLosEquipos = equipoServiceCliente.obtenerTodosLosEquipos();
+        List<Partido> partidosFinalizados = partidoRepository.findAllByEstado("finalizado");
 
-        Query q = em.createNativeQuery(sql);
-        @SuppressWarnings("unchecked")
-        List<Object[]> rows = q.getResultList();
+        Map<Integer, PosicionDTO> estadisticas = todosLosEquipos.stream()
+            .collect(Collectors.toMap(
+                EquipoDTO::getIdEquipo, 
+                equipo -> new PosicionDTO(0, equipo.getIdEquipo().longValue(), equipo.getNombre(), 0, 0, 0, 0, 0, 0, 0, 0) // <-- CORREGIDO
+            ));
 
-        List<PosicionDTO> lista = new ArrayList<>();
-        for (Object[] r : rows) {
-            // r: [id_equipo, nombre, partidos_jugados, ganados, empatados, perdidos, goles_favor, goles_contra, diferencia_goles, puntos]
-            Long equipoId = r[0] == null ? null : ((Number) r[0]).longValue();
-            String nombre = r[1] == null ? "" : r[1].toString();
-            Integer pj = r[2] == null ? 0 : ((Number) r[2]).intValue();
-            Integer g = r[3] == null ? 0 : ((Number) r[3]).intValue();
-            Integer e = r[4] == null ? 0 : ((Number) r[4]).intValue();
-            Integer p = r[5] == null ? 0 : ((Number) r[5]).intValue();
-            Integer gf = r[6] == null ? 0 : ((Number) r[6]).intValue();
-            Integer ga = r[7] == null ? 0 : ((Number) r[7]).intValue();
-            Integer dg = r[8] == null ? (gf - ga) : ((Number) r[8]).intValue();
-            Integer pts = r[9] == null ? 0 : ((Number) r[9]).intValue();
+        for (Partido partido : partidosFinalizados) {
+            PosicionDTO localStats = estadisticas.get(partido.getIdEquipoLocal());
+            PosicionDTO visitanteStats = estadisticas.get(partido.getIdEquipoVisitante());
 
-            PosicionDTO dto = new PosicionDTO(equipoId, nombre, pj, g, e, p, gf, ga, dg, pts);
-            lista.add(dto);
+            if (localStats == null || visitanteStats == null) {
+                continue;
+            }
+
+            localStats.setPartidosJugados(localStats.getPartidosJugados() + 1);
+            visitanteStats.setPartidosJugados(visitanteStats.getPartidosJugados() + 1);
+            localStats.setGolesFavor(localStats.getGolesFavor() + partido.getGolesLocal());
+            localStats.setGolesContra(localStats.getGolesContra() + partido.getGolesVisitante());
+            visitanteStats.setGolesFavor(visitanteStats.getGolesFavor() + partido.getGolesVisitante());
+            visitanteStats.setGolesContra(visitanteStats.getGolesContra() + partido.getGolesLocal());
+
+            if (partido.getGolesLocal() > partido.getGolesVisitante()) {
+                localStats.setGanados(localStats.getGanados() + 1);
+                localStats.setPuntos(localStats.getPuntos() + 3);
+                visitanteStats.setPerdidos(visitanteStats.getPerdidos() + 1);
+            } else if (partido.getGolesVisitante() > partido.getGolesLocal()) {
+                visitanteStats.setGanados(visitanteStats.getGanados() + 1);
+                visitanteStats.setPuntos(visitanteStats.getPuntos() + 3);
+                localStats.setPerdidos(localStats.getPerdidos() + 1);
+            } else {
+                localStats.setEmpatados(localStats.getEmpatados() + 1);
+                localStats.setPuntos(localStats.getPuntos() + 1);
+                visitanteStats.setEmpatados(visitanteStats.getEmpatados() + 1);
+                visitanteStats.setPuntos(visitanteStats.getPuntos() + 1);
+            }
         }
 
-        // ordenar: puntos DESC, diferencia DESC, golesFavor DESC, nombre ASC
-        lista.sort(Comparator.comparing(PosicionDTO::getPuntos).reversed()
-                .thenComparing(PosicionDTO::getDiferenciaGoles, Comparator.nullsLast(Comparator.reverseOrder()))
-                .thenComparing(PosicionDTO::getGolesFavor, Comparator.nullsLast(Comparator.reverseOrder()))
-                .thenComparing(PosicionDTO::getNombre));
-
-        // asignar posiciones (1..n)
+        List<PosicionDTO> tablaFinal = estadisticas.values().stream()
+                .peek(dto -> dto.setDiferenciaGoles(dto.getGolesFavor() - dto.getGolesContra()))
+                .sorted(
+                    Comparator.comparing(PosicionDTO::getPuntos).reversed()
+                    .thenComparing(PosicionDTO::getDiferenciaGoles, Comparator.reverseOrder())
+                    .thenComparing(PosicionDTO::getGolesFavor, Comparator.reverseOrder())
+                    .thenComparing(PosicionDTO::getNombre)
+                )
+                .collect(Collectors.toList());
+        
         int pos = 1;
-        for (PosicionDTO d : lista) {
-            d.setPosicion(pos++);
+        for (PosicionDTO dto : tablaFinal) {
+            dto.setPosicion(pos++);
         }
 
-        return lista;
+        return tablaFinal;
     }
 }

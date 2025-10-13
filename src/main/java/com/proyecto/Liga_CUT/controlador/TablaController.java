@@ -8,13 +8,14 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "*") 
 public class TablaController {
     private final ServicioTabla servicioTabla;
 
     public TablaController(ServicioTabla servicioTabla) {
         this.servicioTabla = servicioTabla;
     }
+    
     @GetMapping("/tabla")
     public List<PosicionDTO> obtenerTabla() {
         return servicioTabla.obtenerTabla();
