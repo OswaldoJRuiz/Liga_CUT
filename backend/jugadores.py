@@ -3,12 +3,12 @@ from pydantic import BaseModel
 from typing import List
 from sqlalchemy.orm import Session
 
-from backend.database import SessionLocal
-from backend.models import Jugador as JugadorDB
+from database import SessionLocal
+from models import Jugador as JugadorModel
 
 router = APIRouter()
 
-class Jugador(BaseModel):
+class JugadorSchema(BaseModel):
     id: int
     nombre: str
     posicion: str
@@ -26,28 +26,27 @@ def get_db():
     finally:
         db.close()
 
-@router.get("/", response_model=List[Jugador])
+@router.get("/", response_model=List[JugadorSchema])
 def listar_jugadores(db: Session = Depends(get_db)):
-    return db.query(JugadorDB).all()
+    return db.query(JugadorModel).all()
 
-@router.post("/", response_model=Jugador)
-def agregar_jugador(jugador: Jugador, db: Session = Depends(get_db)):
-    # Verificar si ID o dorsal ya existen
-    existente = db.query(JugadorDB).filter(
-        (JugadorDB.id == jugador.id) | (JugadorDB.dorsal == jugador.dorsal)
+@router.post("/", response_model=JugadorSchema)
+def agregar_jugador(jugador: JugadorSchema, db: Session = Depends(get_db)):
+    existente = db.query(JugadorModel).filter(
+        (JugadorModel.id == jugador.id) | (JugadorModel.dorsal == jugador.dorsal)
     ).first()
     if existente:
         raise HTTPException(status_code=400, detail="ID o dorsal ya existe")
     
-    nuevo = JugadorDB(**jugador.dict())
+    nuevo = JugadorModel(**jugador.dict())
     db.add(nuevo)
     db.commit()
     db.refresh(nuevo)
     return nuevo
 
-@router.put("/{jugador_id}", response_model=Jugador)
-def actualizar_jugador(jugador_id: int, datos: Jugador, db: Session = Depends(get_db)):
-    jugador = db.query(JugadorDB).filter(JugadorDB.id == jugador_id).first()
+@router.put("/{jugador_id}", response_model=JugadorSchema)
+def actualizar_jugador(jugador_id: int, datos: JugadorSchema, db: Session = Depends(get_db)):
+    jugador = db.query(JugadorModel).filter(JugadorModel.id == jugador_id).first()
     if not jugador:
         raise HTTPException(status_code=404, detail="Jugador no encontrado")
     
@@ -60,7 +59,7 @@ def actualizar_jugador(jugador_id: int, datos: Jugador, db: Session = Depends(ge
 
 @router.delete("/{jugador_id}")
 def eliminar_jugador(jugador_id: int, db: Session = Depends(get_db)):
-    jugador = db.query(JugadorDB).filter(JugadorDB.id == jugador_id).first()
+    jugador = db.query(JugadorModel).filter(JugadorModel.id == jugador_id).first()
     if not jugador:
         raise HTTPException(status_code=404, detail="Jugador no encontrado")
     

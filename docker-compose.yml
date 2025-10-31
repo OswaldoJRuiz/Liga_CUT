@@ -1,40 +1,41 @@
-version: "3.9"
-
 services:
   db:
-    image: postgres:15
-    container_name: postgres_db
-    restart: always
+    image: postgres:13
     environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin
       POSTGRES_DB: liga_cut
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: oswaldo
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   backend:
-    build: ./backend
-    container_name: fastapi_backend
-    restart: always
-    depends_on:
-      - db
-    environment:
-      DATABASE_URL: postgresql+psycopg2://admin:admin@db:5432/liga_cut
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
     ports:
       - "8000:8000"
-    volumes:
-      - ./backend:/app
+    environment:
+      DATABASE_URL: postgresql+psycopg2://postgres:oswaldo@db:5432/liga_cut
+    depends_on:
+      db:
+        condition: service_healthy
 
-  frontend:
-    build: ./frontend
-    container_name: frontend_app
-    restart: always
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: liga.cut@tonala.com    # NUEVO EMAIL
+      PGADMIN_DEFAULT_PASSWORD: LigaCut2024!        # NUEVA CONTRASEÑA FUERTE
     ports:
-      - "8080:80"
-    volumes:
-      - ./frontend:/usr/share/nginx/html
+      - "5050:80"
+    depends_on:
+      - db
 
 volumes:
   postgres_data:

@@ -3,12 +3,12 @@ from pydantic import BaseModel
 from typing import List
 from sqlalchemy.orm import Session
 
-from backend.database import SessionLocal
-from backend.models import Equipo as EquipoDB
+from database import SessionLocal
+from models import Equipo as EquipoModel
 
 router = APIRouter()
 
-class Equipo(BaseModel):
+class EquipoSchema(BaseModel):
     id: int
     nombre: str
     num_jugadores: int
@@ -23,24 +23,23 @@ def get_db():
     finally:
         db.close()
 
-@router.get("/", response_model=List[Equipo])
+@router.get("/", response_model=List[EquipoSchema])
 def listar_equipos(db: Session = Depends(get_db)):
-    return db.query(EquipoDB).all()
+    return db.query(EquipoModel).all()
 
-@router.post("/", response_model=Equipo)
-def agregar_equipo(equipo: Equipo, db: Session = Depends(get_db)):
-    # Validar si ya existe
-    existente = db.query(EquipoDB).filter(
-        (EquipoDB.id == equipo.id) | (EquipoDB.nombre == equipo.nombre)
+@router.post("/", response_model=EquipoSchema)
+def agregar_equipo(equipo: EquipoSchema, db: Session = Depends(get_db)):
+    existente = db.query(EquipoModel).filter(
+        (EquipoModel.id == equipo.id) | (EquipoModel.nombre == equipo.nombre)
     ).first()
     if existente:
         raise HTTPException(status_code=400, detail="ID o nombre ya existe")
 
-    nuevo = EquipoDB(
+    nuevo = EquipoModel(
         id=equipo.id,
         nombre=equipo.nombre,
         num_jugadores=equipo.num_jugadores,
-        logo=None  # Sin logo por ahora
+        logo=None
     )
     
     db.add(nuevo)
@@ -48,9 +47,9 @@ def agregar_equipo(equipo: Equipo, db: Session = Depends(get_db)):
     db.refresh(nuevo)
     return nuevo
 
-@router.put("/{equipo_id}", response_model=Equipo)
-def actualizar_equipo(equipo_id: int, equipo: Equipo, db: Session = Depends(get_db)):
-    equipo_db = db.query(EquipoDB).filter(EquipoDB.id == equipo_id).first()
+@router.put("/{equipo_id}", response_model=EquipoSchema)
+def actualizar_equipo(equipo_id: int, equipo: EquipoSchema, db: Session = Depends(get_db)):
+    equipo_db = db.query(EquipoModel).filter(EquipoModel.id == equipo_id).first()
     if not equipo_db:
         raise HTTPException(status_code=404, detail="Equipo no encontrado")
 
@@ -63,7 +62,7 @@ def actualizar_equipo(equipo_id: int, equipo: Equipo, db: Session = Depends(get_
 
 @router.delete("/{equipo_id}")
 def eliminar_equipo(equipo_id: int, db: Session = Depends(get_db)):
-    equipo = db.query(EquipoDB).filter(EquipoDB.id == equipo_id).first()
+    equipo = db.query(EquipoModel).filter(EquipoModel.id == equipo_id).first()
     if not equipo:
         raise HTTPException(status_code=404, detail="Equipo no encontrado")
 

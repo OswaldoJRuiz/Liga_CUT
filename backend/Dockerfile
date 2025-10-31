@@ -1,17 +1,17 @@
-# Imagen base de Python
-FROM python:3.13-slim
+FROM python:3.11-slim
 
-# Configurar directorio de trabajo
 WORKDIR /app
 
-# Copiar los archivos del backend al contenedor
-COPY . /app
+# Copiar requirements.txt
+COPY requirements.txt .
 
 # Instalar dependencias
-RUN pip install --no-cache-dir fastapi uvicorn sqlalchemy psycopg2-binary
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Exponer el puerto del backend
+# Copiar todo el código del backend
+COPY . .
+
 EXPOSE 8000
 
-# Comando para ejecutar FastAPI
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Comando que espera a la BD y luego ejecuta la app
+CMD ["sh", "-c", "python wait_for_db.py && uvicorn main:app --host 0.0.0.0 --port 8000"]

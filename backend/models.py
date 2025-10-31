@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
-from .database import Base
+from database import Base  # Importación directa
 
 
 class Equipo(Base):
@@ -11,7 +11,6 @@ class Equipo(Base):
     num_jugadores = Column(Integer, nullable=False)
     logo = Column(String)
 
-    # Relación con jugadores
     jugadores = relationship("Jugador", back_populates="equipo", cascade="all, delete")
 
 
@@ -24,7 +23,5 @@ class Jugador(Base):
     dorsal = Column(Integer, nullable=False, unique=True)
     goles = Column(Integer, default=0)
 
-    # Relación con equipo (obligatoria)
     equipo_id = Column(Integer, ForeignKey("equipos.id"), nullable=False)
-
     equipo = relationship("Equipo", back_populates="jugadores")
