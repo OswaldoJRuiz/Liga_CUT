@@ -25,14 +25,19 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     description="Documentacion de mi microservicio para la autenticacion de usuario y permisos",
     title="Permisos_Microservicio_Por_Diego: Auth: Login y register, token, hash. Permissions: CRUD de permisos. Admin: Asignacion de permisos a usuarios",
-    summary="Login, Register, panel de administracion de permisos y permisos"
+    summary="Login, Register, panel de administracion de permisos y permisos",
+    lifespan=lifespan 
 )
 
 
 """configuracion CORS"""
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+        allow_origins=[
+        "http://localhost:3001",
+        "http://127.0.0.1:3001",
+        "http://localhost:3000",
+    ],
     allow_credentials=True,
     allow_methods=["*"], # todos los metodos (get, post, put, delete)
     allow_headers=["*"], # todos los headers (Content-Type, Authorization, etc.
