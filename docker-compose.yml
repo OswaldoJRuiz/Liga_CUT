@@ -6,35 +6,37 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: liga_cut_db
+      POSTGRES_DB: auth_db
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres -d liga_cut_db" ]
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 5s
       timeout: 3s
       retries: 10
 
   backend:
     build:
-      context: . # toda la carpeta Liga_CUT
+      context: .
       dockerfile: ./src/Dockerfile
     container_name: liga_cut_backend
     depends_on:
       db:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgres://postgres:postgres@db:5432/liga_cut_db
-      PYTHONPATH: /app
-    volumes:
-      - ./src:/app
-    working_dir: /app
-    command: poetry run uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+      # versión síncrona para Alembic
+      DATABASE_URL: postgresql+psycopg2://postgres:postgres@db:5432/auth_db
+      # versión asíncrona para SQLAlchemy async
+      DATABASE_URL_ASYNC: postgresql+asyncpg://postgres:postgres@db:5432/auth_db
+      SECRET_KEY: LIGA_CUT
+      ALGORITHM: HS256
+      ACCESS_TOKEN_EXPIRE_MINUTES: 35
     ports:
-      - "8001:8000"
+      - "8000:8000"
     restart: unless-stopped
+    command: poetry run uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 
   frontend:
     build:
@@ -43,13 +45,8 @@ services:
     container_name: liga_cut_frontend
     depends_on:
       - backend
-    environment:
-      NEXT_PUBLIC_API_URL: http://backend:8000
     ports:
       - "3001:3000"
-    volumes:
-      - ./web:/app
-    command: npm run dev
     restart: unless-stopped
 
 volumes:
