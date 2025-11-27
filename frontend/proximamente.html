@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Liga ATHORA</title>
+
+  <!-- Fuente moderna -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background-color: #0f172a;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+    
+    /* Estilos para los balones */
+    .ball-icon {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      border: 2px solid #1e293b;
+    }
+    
+    .volleyball {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: white;
+    }
+    
+    .basketball {
+      background: linear-gradient(135deg, #f97316, #ea580c);
+      color: white;
+    }
+    
+    .athletics {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+    }
+  </style>
+</head>
+
+<body class="text-white">
+
+  <!--  BARRA DE NAVEGACIÓN -->
+  <nav class="w-full bg-gray-900 bg-opacity-95 shadow-lg fixed top-0 z-50">
+    <div class="max-w-7xl mx-auto flex items-center justify-center space-x-8 py-4 text-gray-200 font-semibold text-sm md:text-base">
+      <a href="index.html" class="block px-4 py-2 text-[#e2e8f0] hover:bg-[#22c55e]/20">Registro</a>
+      <a href="inicio.html" class="block px-4 py-2 text-[#e2e8f0] font-semibold">Inicio</a>
+      <a href="conocenos.html" class="block px-4 py-2 text-[#e2e8f0] hover:bg-[#22c55e]/20">Conócenos</a>
+      <a href="calendario.html" class="block px-4 py-2 text-[#e2e8f0] hover:bg-[#22c55e]/20">Calendario</a>
+      <a href="equipos_registrados.html" class="block px-4 py-2 text-[#e2e8f0] hover:bg-[#22c55e]/20">Equipos Registrados</a>
+      
+    </div>
+  </nav>
+
+  <!--  SECCIÓN INICIO -->
+  <section id="inicio" class="relative flex flex-col items-center justify-center text-center px-6 py-28 overflow-hidden bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 mt-16">
+    <!-- Fondo decorativo -->
+    <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/asfalt-dark.png')]"></div>
+
+    <!-- Contenido principal -->
+    <div class="relative z-10 max-w-4xl flex flex-col items-center">
+      
+      <!-- Tus textos originales -->
+      <h1 class="text-4xl md:text-6xl font-extrabold mb-6 tracking-wide">
+        Proximamente con <span class="text-blue-400">ATHORA</span>
+      </h1>
+      <p class="text-lg md:text-xl text-gray-300 max-w-2xl leading-relaxed mb-10">
+       Preparate para las nuevas ligas y competencias que habra pronto en nuestra plataforma.
+        
+      </p>
+      
+         
+    </div>
+
+    <!-- Efecto de ondas inferiores -->
+    <svg class="absolute bottom-0 left-0 w-full h-24 text-gray-900" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" fill="currentColor">
+      <path fill-opacity="1" d="M0,64L80,101.3C160,139,320,213,480,240C640,267,800,245,960,208C1120,171,1280,117,1360,90.7L1440,64L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z"></path>
+    </svg>
+  </section>
+
+   <!--  SECCIÓN Deporte -->
+  <section class="py-16 px-6 bg-gradient-to-b from-gray-900 to-gray-800">
+    <div class="max-w-6xl mx-auto">
+      <!-- Tarjetas de Deportes -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        
+        <!-- Volley -->
+        <a href="#" class="bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-700 hover:scale-105 group">
+          <div class="text-center">
+            <div class="relative inline-block mb-4">
+              <img src="assets/Volley.png" alt="Foto Oswaldo" class="w-32 h-32 rounded-full mx-auto object-cover border-4 border-gray-700 group-hover:border-blue-500 transition-colors">
+              <div class="absolute bottom-0 right-0 bg-blue-500 rounded-full p-2 border-2 border-gray-800">
+                <div class="ball-icon volleyball">
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 13l-4-4 1.41-1.41L10 12.17l6.59-6.59L18 8l-8 8z"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <h2 class="text-xl font-bold text-white mb-2">VolleyBall</h2>
+            <div class="flex flex-wrap justify-center gap-1 mb-3">
+              <span class="bg-blue-500/20 text-blue-300 px-2 py-1 rounded-full text-xs">Athora Volley</span>
+            </div>
+            <p class="text-gray-300 text-sm">Liga de VolleyBall para universitarios de UDG de cualquier centro</p>
+          </div>
+        </a>
+
+        <!-- Basketball -->
+        <a href="#" class="bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-700 hover:scale-105 group">
+          <div class="text-center">
+            <div class="relative inline-block mb-4">
+             <img src="assets/Basket.png" alt="Basket" class="w-32 h-32 rounded-full mx-auto object-cover border-4 border-gray-700 group-hover:border-blue-500 transition-colors">
+              <div class="absolute bottom-0 right-0 bg-blue-500 rounded-full p-2 border-2 border-gray-800">
+                <div class="ball-icon basketball">
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 13l-4-4 1.41-1.41L10 12.17l6.59-6.59L18 8l-8 8z"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <h2 class="text-xl font-bold text-white mb-2">Basketball</h2>
+            <div class="flex flex-wrap justify-center gap-1 mb-3">
+              <span class="bg-blue-500/20 text-blue-300 px-2 py-1 rounded-full text-xs">Athora Volley</span>
+            </div>
+            <p class="text-gray-300 text-sm">Desarrollate con la Liga de basketball desde cualquier centro!</p>
+          </div>
+        </a>
+
+        <!-- Atletismo -->
+        <a href="#" class="bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-700 hover:scale-105 group">
+          <div class="text-center">
+            <div class="relative inline-block mb-4">
+             <img src="assets/Acletismo.png" alt="Atletismo" class="w-32 h-32 rounded-full mx-auto object-cover border-4 border-gray-700 group-hover:border-blue-500 transition-colors">
+              <div class="absolute bottom-0 right-0 bg-blue-500 rounded-full p-2 border-2 border-gray-800">
+                <div class="ball-icon athletics">
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 13l-4-4 1.41-1.41L10 12.17l6.59-6.59L18 8l-8 8z"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <h2 class="text-xl font-bold text-white mb-2">Atletismo</h2>
+            <div class="flex flex-wrap justify-center gap-1 mb-3">
+              <span class="bg-blue-500/20 text-blue-300 px-2 py-1 rounded-full text-xs">Athora Volley</span>
+            </div>
+            <p class="text-gray-300 text-sm">Vuelvete el mas rapido con la Liga de Atletismo desde cualquier centro!</p>
+          </div>
+        </a>
+
+      </div>
+    </div>
+  </section>
+<!-- 🦶 FOOTER -->
+  <footer class="bg-gray-900 py-8 text-center">
+    <div class="max-w-6xl mx-auto px-6">
+      <p class="text-gray-400">&copy; 2025 Liga CUT Tonalá - Todos los derechos reservados.</p>
+      
+    </div>
+  </footer>
+</body>
+</html>

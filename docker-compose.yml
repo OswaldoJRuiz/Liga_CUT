@@ -30,8 +30,8 @@ services:
   pgadmin:
     image: dpage/pgadmin4
     environment:
-      PGADMIN_DEFAULT_EMAIL: liga.cut@tonala.com    # NUEVO EMAIL
-      PGADMIN_DEFAULT_PASSWORD: LigaCut2024!        # NUEVA CONTRASEÑA FUERTE
+      PGADMIN_DEFAULT_EMAIL: liga.cut@tonala.com    #  EMAIL
+      PGADMIN_DEFAULT_PASSWORD: LigaCut2024!        # NUEA CONTRASEÑA FUERTE
     ports:
       - "5050:80"
     depends_on:

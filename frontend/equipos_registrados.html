@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Equipos Registrados - Liga ATHORA</title>
+
+  <!-- Fuente moderna -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background-color: #0f172a;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+    
+    /* Estilos para las tarjetas */
+    .team-card {
+      transition: all 0.3s ease;
+    }
+    
+    .team-card:hover {
+      transform: translateY(-5px);
+    }
+    
+    .player-card {
+      transition: all 0.2s ease;
+    }
+    
+    .player-card:hover {
+      background-color: #374151;
+    }
+    
+    /* Animación para mostrar jugadores */
+    .players-container {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.5s ease;
+    }
+    
+    .players-container.expanded {
+      max-height: 1000px;
+    }
+    
+    .loading-spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #3b82f6;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+
+<body class="text-white">
+
+  <!-- BARRA DE NAVEGACIÓN -->
+  <nav class="w-full bg-gray-900 bg-opacity-95 shadow-lg fixed top-0 z-50">
+    <div class="max-w-7xl mx-auto flex items-center justify-center space-x-8 py-4 text-gray-200 font-semibold text-sm md:text-base">
+      <a href="index.html" class="block px-4 py-2 text-[#e2e8f0] hover:bg-[#22c55e]/20">Registro</a>
+      <a href="inicio.html" class="block px-4 py-2 text-[#e2e8f0] hover:bg-[#22c55e]/20">Inicio</a>
+      <a href="conocenos.html" class="block px-4 py-2 text-[#e2e8f0] hover:bg-[#22c55e]/20">Conócenos</a>
+      <a href="calendario.html" class="block px-4 py-2 text-[#e2e8f0] hover:bg-[#22c55e]/20">Calendario</a>
+      <a href="equipos_registrados.html" class="block px-4 py-2 text-[#22c55e] font-semibold bg-[#22c55e]/20 rounded">Equipos Registrados</a>
+    </div>
+  </nav>
+
+  <!-- SECCIÓN PRINCIPAL -->
+  <section class="relative min-h-screen pt-24 pb-16 px-6 bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900">
+    <!-- Fondo decorativo -->
+    <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/asfalt-dark.png')]"></div>
+
+    <div class="relative z-10 max-w-7xl mx-auto">
+      <!-- Encabezado -->
+      <div class="text-center mb-12">
+        <h1 class="text-4xl md:text-5xl font-extrabold mb-4 tracking-wide">
+          Equipos <span class="text-blue-400">Registrados</span>
+        </h1>
+        <p class="text-lg text-gray-300 max-w-2xl mx-auto">
+          Consulta todos los equipos registrados en la liga y sus jugadores
+        </p>
+      </div>
+
+      <!-- Estado de carga -->
+      <div id="loadingState" class="text-center py-8">
+        <div class="loading-spinner"></div>
+        <p class="text-gray-400 mt-4">Cargando equipos...</p>
+      </div>
+
+      <!-- Grid de equipos -->
+      <div id="teamsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 hidden">
+        <!-- Las tarjetas de equipos se generarán dinámicamente aquí -->
+      </div>
+
+      <!-- Mensaje cuando no hay equipos -->
+      <div id="noTeamsMessage" class="text-center py-12 hidden">
+        <div class="bg-gray-800 rounded-2xl p-8 max-w-md mx-auto">
+          <svg class="w-16 h-16 text-gray-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <h3 class="text-xl font-bold text-white mb-2">No hay equipos registrados</h3>
+          <p class="text-gray-400">Los equipos aparecerán aquí una vez que se registren en el sistema.</p>
+        </div>
+      </div>
+
+      <!-- Mensaje de error -->
+      <div id="errorMessage" class="text-center py-12 hidden">
+        <div class="bg-red-900/20 border border-red-800 rounded-2xl p-8 max-w-md mx-auto">
+          <svg class="w-16 h-16 text-red-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <h3 class="text-xl font-bold text-white mb-2">Error al cargar equipos</h3>
+          <p class="text-gray-400" id="errorText">No se pudieron cargar los equipos. Intenta recargar la página.</p>
+          <button onclick="loadTeams()" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors">
+            Reintentar
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // CONFIGURACIÓN - URL de tu API FastAPI
+    const API_BASE_URL = 'http://127.0.0.1:8000';
+  
+    // Función para obtener iniciales
+    function getInitials(name) {
+      if (!name) return '??';
+      return name.split(' ').map(word => word[0]).join('').toUpperCase().substring(0, 2);
+    }
+
+    // Función para cargar equipos desde la API
+    async function loadTeams() {
+      console.log('Cargando equipos desde:', API_BASE_URL);
+      
+      const loadingState = document.getElementById('loadingState');
+      const teamsContainer = document.getElementById('teamsContainer');
+      const noTeamsMessage = document.getElementById('noTeamsMessage');
+      const errorMessage = document.getElementById('errorMessage');
+
+      // Mostrar loading, ocultar otros estados
+      loadingState.classList.remove('hidden');
+      teamsContainer.classList.add('hidden');
+      noTeamsMessage.classList.add('hidden');
+      errorMessage.classList.add('hidden');
+
+      try {
+        // Obtener equipos
+        console.log('Obteniendo equipos...');
+        const equiposResponse = await fetch(`${API_BASE_URL}/equipos/`);
+        console.log('Respuesta equipos:', equiposResponse);
+        
+        if (!equiposResponse.ok) {
+          throw new Error(`Error ${equiposResponse.status}: ${equiposResponse.statusText}`);
+        }
+        const equipos = await equiposResponse.json();
+        console.log('Equipos obtenidos:', equipos);
+
+        // Obtener jugadores
+        console.log('Obteniendo jugadores...');
+        const jugadoresResponse = await fetch(`${API_BASE_URL}/jugadores/`);
+        console.log('Respuesta jugadores:', jugadoresResponse);
+        
+        if (!jugadoresResponse.ok) {
+          throw new Error(`Error ${jugadoresResponse.status}: ${jugadoresResponse.statusText}`);
+        }
+        const jugadores = await jugadoresResponse.json();
+        console.log('Jugadores obtenidos:', jugadores);
+
+        // Agrupar jugadores por equipo
+        const jugadoresPorEquipo = {};
+        jugadores.forEach(jugador => {
+          if (!jugadoresPorEquipo[jugador.equipo_id]) {
+            jugadoresPorEquipo[jugador.equipo_id] = [];
+          }
+          jugadoresPorEquipo[jugador.equipo_id].push(jugador);
+        });
+
+        console.log('Jugadores por equipo:', jugadoresPorEquipo);
+
+        // Renderizar equipos
+        renderTeams(equipos, jugadoresPorEquipo);
+
+      } catch (error) {
+        console.error('Error cargando datos:', error);
+        document.getElementById('errorText').textContent = error.message;
+        errorMessage.classList.remove('hidden');
+      } finally {
+        loadingState.classList.add('hidden');
+      }
+    }
+
+    // Función para renderizar equipos
+    function renderTeams(equipos, jugadoresPorEquipo) {
+      const container = document.getElementById('teamsContainer');
+      const noTeamsMessage = document.getElementById('noTeamsMessage');
+      
+      if (equipos.length === 0) {
+        container.classList.add('hidden');
+        noTeamsMessage.classList.remove('hidden');
+        return;
+      }
+
+      container.innerHTML = '';
+      container.classList.remove('hidden');
+      noTeamsMessage.classList.add('hidden');
+
+      equipos.forEach(equipo => {
+        const jugadoresDelEquipo = jugadoresPorEquipo[equipo.id] || [];
+        
+        const teamCard = document.createElement('div');
+        teamCard.className = 'team-card bg-gray-800 rounded-2xl shadow-lg border border-gray-700 overflow-hidden';
+        teamCard.innerHTML = `
+          <div class="p-6">
+            <div class="flex justify-between items-start mb-4">
+              <div>
+                <h3 class="text-xl font-bold text-white">${equipo.nombre}</h3>
+                <div class="flex items-center mt-1">
+                  <span class="bg-blue-500/20 text-blue-300 px-2 py-1 rounded-full text-xs">Equipo ID: ${equipo.id}</span>
+                </div>
+              </div>
+              <div class="bg-blue-500 rounded-full w-12 h-12 flex items-center justify-center text-white font-bold">
+                ${getInitials(equipo.nombre)}
+              </div>
+            </div>
+            
+            <div class="flex justify-between items-center mb-4">
+              <div class="text-gray-300">
+                <span class="font-semibold">${jugadoresDelEquipo.length}</span> jugadores de <span class="font-semibold">${equipo.num_jugadores}</span> registrados
+              </div>
+              <button class="toggle-players-btn bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center">
+                <span>Ver jugadores</span>
+                <svg class="w-4 h-4 ml-1 toggle-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+              </button>
+            </div>
+            
+            <!-- Contenedor de jugadores (inicialmente oculto) -->
+            <div class="players-container">
+              <div class="border-t border-gray-700 pt-4">
+                <h4 class="font-semibold text-white mb-3">Jugadores del equipo:</h4>
+                <div class="players-list space-y-2">
+                  ${jugadoresDelEquipo.length > 0 ? 
+                    jugadoresDelEquipo.map(jugador => `
+                      <div class="player-card bg-gray-700 rounded-lg p-3 flex items-center">
+                        <div class="bg-gray-600 rounded-full w-10 h-10 flex items-center justify-center text-white font-semibold">
+                          ${getInitials(jugador.nombre)}
+                        </div>
+                        <div class="ml-3">
+                          <div class="text-white font-medium">${jugador.nombre}</div>
+                          <div class="text-gray-400 text-sm">${jugador.posicion} - Dorsal ${jugador.dorsal}</div>
+                          ${jugador.goles > 0 ? `<div class="text-green-400 text-xs">${jugador.goles} goles</div>` : ''}
+                        </div>
+                      </div>
+                    `).join('') : 
+                    '<p class="text-gray-400 text-center py-4">No hay jugadores registrados en este equipo</p>'
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+
+        // Añadir evento para mostrar/ocultar jugadores
+        const toggleBtn = teamCard.querySelector('.toggle-players-btn');
+        const playersContainer = teamCard.querySelector('.players-container');
+        
+        toggleBtn.addEventListener('click', () => {
+          const isExpanded = playersContainer.classList.contains('expanded');
+          
+          if (isExpanded) {
+            playersContainer.classList.remove('expanded');
+            toggleBtn.innerHTML = '<span>Ver jugadores</span><svg class="w-4 h-4 ml-1 toggle-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>';
+          } else {
+            playersContainer.classList.add('expanded');
+            toggleBtn.innerHTML = '<span>Ocultar jugadores</span><svg class="w-4 h-4 ml-1 toggle-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>';
+          }
+        });
+
+        container.appendChild(teamCard);
+      });
+    }
+
+    // Inicializar cuando se carga la página
+    document.addEventListener('DOMContentLoaded', loadTeams);
+  </script>
+
+</body>
+</html>
