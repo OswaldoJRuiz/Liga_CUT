@@ -1,0 +1,44 @@
+services:
+  db:
+    image: postgres:16
+    container_name: db
+    env_file: .env
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5432:5432"
+
+  backend:
+    build:
+      context: ./Backend         # <— relativo a este compose
+      dockerfile: demo/Dockerfile
+    container_name: backend
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build:
+      context: ./frontend-liga   # <— relativo
+      dockerfile: Dockerfile     # si tu front tiene uno
+    container_name: frontend
+    depends_on:
+      - backend
+    environment:
+      BACKEND_URL: http://backend:8080/
+    ports:
+      - "80:80"
+
+volumes:
+  db_data:
