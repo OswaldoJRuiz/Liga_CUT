@@ -50,7 +50,6 @@ class Admin(Base):
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
-# Agregar esto al final de models.py, después del modelo Admin
 
 class Calendario(Base):
     __tablename__ = "calendario"

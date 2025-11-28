@@ -103,6 +103,26 @@ async function verifyToken() {
     }
 }
 
+// ==================== FUNCIÓN CRÍTICA - AGREGAR PARTIDO ====================
+function abrirModalAgregarPartido() {
+    console.log('Función abrirModalAgregarPartido ejecutada');
+    
+    if (!currentUser || currentUser.user_type !== 'admin') {
+        alert('Solo los administradores pueden registrar partidos');
+        return;
+    }
+    
+    const modal = document.getElementById('addMatchModal');
+    if (modal) {
+        modal.style.display = 'block';
+        console.log('Modal abierto correctamente');
+    } else {
+        console.error('No se encontró el modal addMatchModal');
+    }
+}
+
+window.abrirModalAgregarPartido = abrirModalAgregarPartido;
+
 // Función mejorada para login
 async function loginUser(email, password) {
     try {
@@ -999,13 +1019,13 @@ async function agregarPartido(event) {
         location: document.getElementById('location').value,
         date: fechaInput,
         time: document.getElementById('matchTime').value,
-        local_score: 0,      // ⬅️ Campo requerido
-        visitor_score: 0,    // ⬅️ Campo requerido  
-        status: "pending",   // ⬅️ Campo requerido
-        year: year          // ⬅️ ¡ESTE ES EL CAMPO QUE FALTABA!
+        local_score: 0,      // ⬅ Campo requerido
+        visitor_score: 0,    // ⬅ Campo requerido  
+        status: "pending",   // ⬅ Campo requerido
+        year: year          // ⬅¡ESTE ES EL CAMPO QUE FALTABA!
     };
 
-    console.log('📤 ENVIANDO CON TODOS LOS CAMPOS REQUERIDOS:', nuevoPartido);
+    console.log(' ENVIANDO CON TODOS LOS CAMPOS REQUERIDOS:', nuevoPartido);
 
     try {
         const response = await fetch(`${API_URL}/calendario/`, {
@@ -1017,7 +1037,7 @@ async function agregarPartido(event) {
             body: JSON.stringify(nuevoPartido)
         });
 
-        console.log('📥 Respuesta del servidor - Status:', response.status);
+        console.log(' Respuesta del servidor - Status:', response.status);
 
         if (!response.ok) {
             let errorMessage = `Error ${response.status}: ${response.statusText}`;
@@ -1224,7 +1244,7 @@ function actualizarUIUsuarioCalendario() {
         if (adminSection) adminSection.classList.remove('hidden');
         if (userMessage) userMessage.classList.add('hidden');
     } else {
-        console.log("👤 Ocultando botones de admin en calendario");
+        console.log(" Ocultando botones de admin en calendario");
         if (adminSection) adminSection.classList.add('hidden');
         if (userMessage) userMessage.classList.remove('hidden');
     }
@@ -1232,7 +1252,7 @@ function actualizarUIUsuarioCalendario() {
 
 // Función para notificar al calendario cuando cambia la autenticación
 function notificarCambioAuthCalendario() {
-    console.log("🔄 Actualizando UI del calendario por cambio de auth");
+    console.log(" Actualizando UI del calendario por cambio de auth");
     actualizarUIUsuarioCalendario();
     if (document.getElementById('matchesContainer')) {
         renderizarPartidos(); // Re-renderizar para mostrar/ocultar botones

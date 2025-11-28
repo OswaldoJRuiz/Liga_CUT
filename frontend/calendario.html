@@ -95,6 +95,35 @@
       display: none !important;
     }
   </style>
+
+  <!-- Script de inicialización -->
+  <script>
+    // Esperar a que todo esté cargado
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log("Inicializando calendario...");
+      
+      // Esperar a que script.js se cargue
+      const checkScriptLoaded = setInterval(() => {
+        if (typeof inicializarCalendario !== 'undefined') {
+          clearInterval(checkScriptLoaded);
+          inicializarCalendario();
+        }
+      }, 100);
+
+      // Timeout de seguridad
+      setTimeout(() => {
+        if (typeof inicializarCalendario === 'undefined') {
+          console.error("Error: script.js no se cargó correctamente");
+          // Recargar la página como último recurso
+          setTimeout(() => {
+            if (typeof inicializarCalendario === 'undefined') {
+              location.reload();
+            }
+          }, 1000);
+        }
+      }, 2000);
+    });
+  </script>
 </head>
 
 <body class="text-white">
@@ -287,14 +316,6 @@
 
   <!-- Script principal -->
   <script src="script.js"></script>
-
-  <script>
-    // Inicializar calendario cuando se carga la página
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log("📅 Inicializando calendario...");
-        inicializarCalendario();
-    });
-  </script>
 
 </body>
 </html>
