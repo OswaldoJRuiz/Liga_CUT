@@ -7,9 +7,12 @@ from .notificaciones import router as notificaciones_router
 import os
 
 
-models.Base.metadata.create_all(bind=engine)
-
 app = FastAPI(title="Microservicio de Notificaciones")
+
+# Crear tablas SOLO cuando la app ya inició
+@app.on_event("startup")
+def startup():
+    models.Base.metadata.create_all(bind=engine)
 
 
 app.add_middleware(
@@ -20,9 +23,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 app.include_router(notificaciones_router)
-
 
 frontend_path = os.path.join(os.path.dirname(__file__), "..", "frontend")
 if os.path.isdir(frontend_path):

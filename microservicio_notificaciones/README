@@ -1,0 +1,102 @@
+# Microservicio de Notificaciones 
+
+Este proyecto implementa un microservicio para manejar notificaciones utilizando FastAPI, SQLAlchemy y un frontend ligero en HTML/JS. Incluye soporte para Docker y una base de datos SQLite por defecto, con posibilidad de usar PostgreSQL o MySQL.
+
+---
+
+# Tecnologías utilizadas
+
+- Python 3.11+
+- FastAPI
+- SQLAlchemy
+- Uvicorn
+- Pydantic
+- SQLite (por defecto)
+- HTML + JavaScript (frontend)
+- Docker y Docker Compose
+
+---
+
+#  Arquitectura General del Sistema
+
+El microservicio sigue una arquitectura simple pero sólida:
+
+
+- **Frontend**: HTML + JS consumiendo la API con Fetch.
+- **API**: Rutas CRUD con FastAPI.
+- **Servicios**: Lógica de negocio (crear, filtrar, eliminar).
+- **ORM**: SQLAlchemy como puente entre Python y la BD.
+- **Base de Datos**: PostgreSQL.
+- **Contenedores**: Docker facilita despliegue y portabilidad.
+
+---
+
+
+# Estructura del Proyecto
+
+microservicio_notificaciones/
+│
+├── docker-compose.yml
+├── Dockerfile
+│
+├── microservicio_notificaciones/
+│ ├── init.py
+│ ├── database.py
+│ ├── main.py
+│ ├── models.py
+│ ├── notificaciones.py
+│ ├── schemas.py
+│ │
+│ ├── frontend/
+│ ├── index.html
+│ ├── script.js
+│
+└── .vscode/
+└── settings.json
+
+
+---
+
+# 🗄️ Base de Datos
+
+El microservicio usa SQLAlchemy con un motor SQLite por defecto.  
+La base de datos contiene una tabla principal: `notificaciones`.
+
+---
+
+# Tabla: notificaciones
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| id | Integer (PK) | Identificador único autoincremental |
+| titulo | String | Título de la notificación |
+| mensaje | String | Contenido de la notificación |
+| tipo | String | info, alerta, error, etc. |
+| fecha_creacion | DateTime | Fecha/hora de creación (UTC) |
+| leida | Boolean | Si la notificación ya fue vista |
+
+### Modelo ORM (models.py)
+```python
+class Notificacion(Base):
+    __tablename__ = "notificaciones"
+
+    id = Column(Integer, primary_key=True, index=True)
+    titulo = Column(String, nullable=False)
+    mensaje = Column(String, nullable=False)
+    tipo = Column(String, default="info")
+    fecha_creacion = Column(DateTime, default=datetime.utcnow)
+    leida = Column(Boolean, default=False)
+
++--------------------------------------------------+
+|                  NOTIFICACIONES                  |
++--------------------------------------------------+
+| id              INTEGER (PK)                     |
+| titulo          STRING                           |
+| mensaje         STRING                           |
+| tipo            STRING                           |
+| fecha_creacion  DATETIME                         |
+| leida           BOOLEAN                          |
++--------------------------------------------------+
+
+
+

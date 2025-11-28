@@ -1,13 +1,41 @@
-version: "3.9"
-
 services:
+  postgres:
+    image: postgres:15
+    container_name: notificaciones_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: notificaciones_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 3s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
   notificaciones:
     build: .
     container_name: microservicio_notificaciones
+    restart: always
     ports:
       - "8000:8000"
-    volumes:
-      - ./microservicio_notificaciones/backend:/app/backend
+    depends_on:
+      postgres:
+        condition: service_healthy
     environment:
-      - ENV=produccion
-      - DEBUG=False
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/notificaciones_db
+    command: >
+      sh -c "
+        echo 'Esperando a PostgreSQL...' &&
+        sleep 3 &&
+        uvicorn microservicio_notificaciones.backend.main:app --host 0.0.0.0 --port 8000
+      "
+
+volumes:
+  postgres_data:
