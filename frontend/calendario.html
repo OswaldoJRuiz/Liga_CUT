@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calendario - Liga ATHORA</title>
+
+  <!-- Fuente moderna -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background-color: #0f172a;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+    
+    /* Estilos para las tarjetas */
+    .match-card {
+      transition: all 0.3s ease;
+    }
+    
+    .match-card:hover {
+      transform: translateY(-3px);
+    }
+    
+    .status-pending {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+    }
+    
+    .status-in-progress {
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    }
+    
+    .status-finished {
+      background: linear-gradient(135deg, #10b981, #059669);
+    }
+    
+    .status-cancelled {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+    }
+    
+    .loading-spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #3b82f6;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.7);
+    }
+    
+    .modal-content {
+      background-color: #1f2937;
+      margin: 5% auto;
+      padding: 0;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+
+    .admin-only {
+      display: none;
+    }
+    
+    .is-admin .admin-only {
+      display: block;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+
+<body class="text-white">
+
+  <!-- BARRA DE NAVEGACIÓN -->
+  <nav class="w-full bg-gray-900 bg-opacity-95 shadow-lg fixed top-0 z-50">
+    <div class="max-w-7xl mx-auto flex items-center justify-center space-x-8 py-4 text-gray-200 font-semibold text-sm md:text-base">
+      <a href="index.html" class="block px-4 py-2 text-[#e2e8f0] hover:bg-[#22c55e]/20">Registro</a>
+      <a href="inicio.html" class="block px-4 py-2 text-[#e2e8f0] hover:bg-[#22c55e]/20">Inicio</a>
+      <a href="conocenos.html" class="block px-4 py-2 text-[#e2e8f0] hover:bg-[#22c55e]/20">Conócenos</a>
+      <a href="calendario.html" class="block px-4 py-2 text-[#22c55e] font-semibold bg-[#22c55e]/20 rounded">Calendario</a>
+      <a href="equipos_registrados.html" class="block px-4 py-2 text-[#e2e8f0] hover:bg-[#22c55e]/20">Equipos Registrados</a>
+    </div>
+  </nav>
+
+  <!-- SECCIÓN PRINCIPAL -->
+  <section class="relative min-h-screen pt-24 pb-16 px-6 bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900">
+    <!-- Fondo decorativo -->
+    <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/asfalt-dark.png')]"></div>
+
+    <div class="relative z-10 max-w-7xl mx-auto">
+      <!-- Encabezado -->
+      <div class="text-center mb-8">
+        <h1 class="text-4xl md:text-5xl font-extrabold mb-4 tracking-wide">
+          Calendario de <span class="text-blue-400">Partidos</span>
+        </h1>
+        <p class="text-lg text-gray-300 max-w-2xl mx-auto">
+          Programa y gestiona los partidos de la liga
+        </p>
+      </div>
+
+      <!-- Información de usuario -->
+      <div id="userInfo" class="text-center mb-6 hidden">
+        <div class="bg-gray-800 rounded-lg p-4 inline-block">
+          <span id="userEmail" class="text-blue-400 font-semibold"></span>
+          <span id="userType" class="text-gray-400 ml-2"></span>
+        </div>
+      </div>
+
+      <!-- Botón para registrar partido (SOLO ADMINS) -->
+      <div id="adminSection" class="text-center mb-8 hidden">
+        <button onclick="abrirModalAgregarPartido()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors flex items-center mx-auto">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          </svg>
+          Registrar Partido
+        </button>
+      </div>
+
+      <!-- Mensaje para usuarios normales -->
+      <div id="userMessage" class="text-center mb-8 bg-blue-900/20 border border-blue-800 rounded-lg p-4 max-w-2xl mx-auto hidden">
+        <p class="text-blue-300">Solo los administradores pueden registrar y modificar partidos. Puedes ver el calendario de partidos programados.</p>
+      </div>
+
+      <!-- Filtros -->
+      <div class="flex flex-wrap justify-center gap-4 mb-8">
+        <button onclick="filtrarPartidos('all')" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors filter-btn active">Todos</button>
+        <button onclick="filtrarPartidos('pending')" class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg transition-colors filter-btn">Pendientes</button>
+        <button onclick="filtrarPartidos('in-progress')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors filter-btn">En Juego</button>
+        <button onclick="filtrarPartidos('finished')" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors filter-btn">Finalizados</button>
+      </div>
+
+      <!-- Estado de carga -->
+      <div id="loadingState" class="text-center py-8">
+        <div class="loading-spinner"></div>
+        <p class="text-gray-400 mt-4">Cargando partidos...</p>
+      </div>
+
+      <!-- Grid de partidos -->
+      <div id="matchesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 hidden">
+        <!-- Las tarjetas de partidos se generarán dinámicamente aquí -->
+      </div>
+
+      <!-- Mensaje cuando no hay partidos -->
+      <div id="noMatchesMessage" class="text-center py-12 hidden">
+        <div class="bg-gray-800 rounded-2xl p-8 max-w-md mx-auto">
+          <svg class="w-16 h-16 text-gray-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <h3 class="text-xl font-bold text-white mb-2">No hay partidos programados</h3>
+          <p class="text-gray-400">No hay partidos registrados en el sistema.</p>
+        </div>
+      </div>
+
+      <!-- Mensaje de error -->
+      <div id="errorMessage" class="text-center py-12 hidden">
+        <div class="bg-red-900/20 border border-red-800 rounded-2xl p-8 max-w-md mx-auto">
+          <svg class="w-16 h-16 text-red-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <h3 class="text-xl font-bold text-white mb-2">Error al cargar partidos</h3>
+          <p class="text-gray-400" id="errorText">No se pudieron cargar los partidos. Intenta recargar la página.</p>
+          <button onclick="cargarPartidos()" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors">
+            Reintentar
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODAL PARA AGREGAR PARTIDO (SOLO ADMINS) -->
+  <div id="addMatchModal" class="modal">
+    <div class="modal-content">
+      <div class="bg-gray-800 p-6 rounded-t-lg">
+        <h2 class="text-2xl font-bold text-white">Registrar Nuevo Partido</h2>
+      </div>
+      <div class="p-6">
+        <form id="matchForm" onsubmit="agregarPartido(event)">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label class="block text-gray-300 mb-2">Equipo Local</label>
+              <select id="localTeam" class="w-full bg-gray-700 text-white px-3 py-2 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                <option value="">Seleccionar equipo local</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-gray-300 mb-2">Equipo Visitante</label>
+              <select id="visitorTeam" class="w-full bg-gray-700 text-white px-3 py-2 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                <option value="">Seleccionar equipo visitante</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label class="block text-gray-300 mb-2">Lugar</label>
+            <select id="location" class="w-full bg-gray-700 text-white px-3 py-2 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+              <option value="CUT">CUT</option>
+            </select>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div>
+              <label class="block text-gray-300 mb-2">Fecha</label>
+              <input type="date" id="matchDate" class="w-full bg-gray-700 text-white px-3 py-2 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+            </div>
+            <div>
+              <label class="block text-gray-300 mb-2">Hora</label>
+              <input type="time" id="matchTime" class="w-full bg-gray-700 text-white px-3 py-2 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+            </div>
+          </div>
+
+          <div class="flex justify-end space-x-3">
+            <button type="button" onclick="cerrarModalAgregarPartido()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors">
+              Cancelar
+            </button>
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+              Registrar Partido
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL PARA ACTUALIZAR MARCADOR (SOLO ADMINS) -->
+  <div id="updateScoreModal" class="modal">
+    <div class="modal-content">
+      <div class="bg-gray-800 p-6 rounded-t-lg">
+        <h2 class="text-2xl font-bold text-white">Actualizar Marcador</h2>
+      </div>
+      <div class="p-6">
+        <form id="scoreForm" onsubmit="actualizarMarcador(event)">
+          <input type="hidden" id="editingMatchId">
+          <div class="grid grid-cols-2 gap-4 mb-6 text-center">
+            <div>
+              <h3 id="localTeamName" class="text-lg font-semibold mb-2">Equipo A</h3>
+              <input type="number" id="localScore" min="0" class="w-20 bg-gray-700 text-white px-3 py-2 rounded-lg border border-gray-600 text-center" value="0">
+            </div>
+            <div class="flex items-center justify-center">
+              <span class="text-2xl font-bold">VS</span>
+            </div>
+            <div>
+              <h3 id="visitorTeamName" class="text-lg font-semibold mb-2">Equipo B</h3>
+              <input type="number" id="visitorScore" min="0" class="w-20 bg-gray-700 text-white px-3 py-2 rounded-lg border border-gray-600 text-center" value="0">
+            </div>
+          </div>
+
+          <div class="flex justify-end space-x-3">
+            <button type="button" onclick="cerrarModalActualizarMarcador()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors">
+              Cancelar
+            </button>
+            <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors">
+              Actualizar Marcador
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Script principal -->
+  <script src="script.js"></script>
+
+  <script>
+    // Inicializar calendario cuando se carga la página
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("📅 Inicializando calendario...");
+        inicializarCalendario();
+    });
+  </script>
+
+</body>
+</html>

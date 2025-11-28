@@ -5,6 +5,8 @@ from database import engine, Base
 from equipos import router as equipos_router
 from jugadores import router as jugadores_router
 from auth.routes import router as auth_router, get_current_user
+from calendario import router as calendario_router
+
 
 # Crear tablas en la base de datos
 Base.metadata.create_all(bind=engine)
@@ -24,6 +26,7 @@ app.add_middleware(
 app.include_router(auth_router, prefix="/auth", tags=["authentication"])
 app.include_router(equipos_router, prefix="/equipos", tags=["equipos"])
 app.include_router(jugadores_router, prefix="/jugadores", tags=["jugadores"])
+app.include_router(calendario_router, prefix="/calendario", tags=["calendario"])
 
 security = HTTPBearer()
 
@@ -38,7 +41,7 @@ def protected_route(current_user: dict = Depends(get_current_user)):
         "user": current_user
     }
 
-# ✅ ENDPOINT DEBUG - AGREGAR ESTO
+#  ENDPOINT DEBUG - AGREGAR ESTO
 @app.get("/debug-current-user")
 def debug_current_user(current_user: dict = Depends(get_current_user)):
     return {

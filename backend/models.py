@@ -49,3 +49,24 @@ class Admin(Base):
     role = Column(String, default="admin")  # 'admin' o 'capitan'
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+# Agregar esto al final de models.py, después del modelo Admin
+
+class Calendario(Base):
+    __tablename__ = "calendario"
+
+    id = Column(Integer, primary_key=True, index=True)
+    local_team_id = Column(Integer, ForeignKey("equipos.id"), nullable=False)
+    visitor_team_id = Column(Integer, ForeignKey("equipos.id"), nullable=False)
+    local_score = Column(Integer, default=0)
+    visitor_score = Column(Integer, default=0)
+    location = Column(String, default="CUT")
+    date = Column(String, nullable=False)  # YYYY-MM-DD
+    time = Column(String, nullable=False)  # HH:MM
+    year = Column(Integer, nullable=False)
+    status = Column(String, default="pending")  # pending, in-progress, finished, cancelled
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    
+    # Relaciones
+    local_team = relationship("Equipo", foreign_keys=[local_team_id])
+    visitor_team = relationship("Equipo", foreign_keys=[visitor_team_id])
