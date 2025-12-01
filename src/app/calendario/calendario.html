@@ -1,0 +1,27 @@
+<h1 class="title-gradient">Calendario de Partidos</h1>
+
+<div class="card">
+  <table class="tabla">
+    <thead>Agenda</thead>
+    <tbody>
+      <tr *ngFor="let p of partidos">
+        <td>{{ p.fecha }}</td>
+        <td>{{ p.hora }}</td>
+        <td>{{ p.local?.nombre }}</td>
+        <td>{{ p.visitante?.nombre }}</td>
+        <td>{{ p.lugar }}</td>
+        <td>{{ p.marcadorLocal }} - {{ p.marcadorVisitante }}</td>
+        <td>
+          <span class="pill"
+                [ngClass]="{
+                  'pill-pendiente': (p.estado || '').toLowerCase() === 'pendiente',
+                  'pill-enjuego':   (p.estado || '').toLowerCase() === 'en juego',
+                  'pill-final':     (p.estado || '').toLowerCase() === 'finalizado'
+                }">
+            {{ p.estado }}
+          </span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

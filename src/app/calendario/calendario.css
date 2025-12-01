@@ -1,0 +1,143 @@
+:host {
+  /* Paleta */
+  --bg: #0f172a;            /* fondo principal (gris-azul oscuro) */
+  --card: #1e293b;          /* tarjeta/tabla (azul grisáceo) */
+  --text: #e2e8f0;          /* texto claro */
+  --muted: #94a3b8;
+
+  --acc-from: #22c55e;      /* verde */
+  --acc-to:   #3b82f6;      /* azul */
+
+  --pill-pend: #fef3c7;     /* amarillo muy claro */
+  --pill-live: #dbeafe;     /* azul claro */
+  --pill-done: #dcfce7;     /* verde claro */
+
+  display: block;
+  min-height: 100vh;        /* para colorear toda la vista sin tocar <body> */
+  background: var(--bg);
+  color: var(--text);
+  padding: 48px 24px;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+:root{
+  --acc-from: #22c55e;    
+  --acc-from: (265 12% 2%);
+  --acc-to: #3b82f6 (330 97% 55%);
+}
+
+.title-gradient{
+  background: linear-gradient(75deg,
+    var(--acc-from) 0%,
+    color-mix(in oklab, var(--acc-from) 40%, var(--acc-to) 60%) 50%,
+    var(--acc-to) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: 800;
+  font-size: clamp(28px, 3vw, 40px);
+  margin: 0 0 24px;
+  -webkit-text-stroke: 1px rgb(0 0 0 / 12%);
+  text-shadow: 0 1px 0 rgb(0 0 0 / 10%), 0 2px 8px rgb(0 0 0 / 12%);
+}
+
+
+/* Tarjeta contenedora */
+.card {
+  background: var(--card);
+  border-radius: 16px;
+  box-shadow: 0 15px 40px rgba(0,0,0,.45);
+  padding: 20px;
+  margin-inline: auto;
+  max-width: 1100px;        /* ajusta ancho máximo de la tabla */
+}
+
+/* Tabla */
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tabla th, .tabla td {
+  padding: 16px 18px;
+  text-align: left;
+}
+
+.tabla thead th {
+  font-weight: 700;
+  color: var(--text);
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+.tabla tbody tr {
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+
+.tabla tbody tr:hover {
+  background: rgba(255,255,255,.03);
+}
+
+/* Pills de estado */
+.pill {
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 600;
+  color: #0f172a;
+  display: inline-block;
+}
+
+.pill-pendiente { background: var(--pill-pend); }
+.pill-enjuego   { background: var(--pill-live); color: #1e3a8a; }
+.pill-final     { background: var(--pill-done); color: #14532d; }
+
+/* ===== Responsivo (Tabla -> Tarjetas) ===== */
+@media (max-width: 768px){
+  /* Oculta encabezados de tabla en móvil */
+  .tabla thead { display: none; }
+
+  /* Convierte estructura a bloques */
+  .tabla, .tabla tbody, .tabla tr, .tabla td {
+    display: block;
+    width: 100%;
+  }
+
+  /* Cada fila parece una “card” sin alterar tu tema */
+  .tabla tbody tr {
+    margin: 10px 0;
+    border: 1px solid rgba(255,255,255,0.08);   /* no cambia tu color base */
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  /* Cada celda ocupa una línea; label a la izquierda, valor a la derecha */
+  .tabla tbody td {
+    position: relative;
+    padding-left: 44%;          /* espacio para la etiqueta */
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border: none;                /* evita líneas dobles */
+  }
+
+  /* Muestra el nombre de la columna como etiqueta */
+  .tabla tbody td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 12px;
+    top: 10px;
+    width: 40%;
+    font-weight: 600;
+    letter-spacing: .02em;
+    opacity: .8;
+    /* NO toco colores: hereda los tuyos */
+  }
+}
+
+/* Ajustes finos de padding para diferentes anchos */
+@media (max-width: 1024px) {
+  .page { padding: 16px; }
+}
+@media (max-width: 480px) {
+  .page { padding: 12px; }
+}
