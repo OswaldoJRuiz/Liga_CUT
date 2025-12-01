@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  /* El color de fondo que ya teníamos */
+  background-color: #0f172a;
+  
+  /* --- LA LÍNEA QUE FALTABA --- */
+  /* Establecemos el color de texto por defecto para toda la página. */
+  color: #d1d5db; /* Este es tu 'text-gray-300' */
+  /* --- FIN DEL ARREGLO --- */
+
+  background-repeat: repeat;
+  background-blend-mode: overlay;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-image: url('https://www.transparenttextures.com/patterns/asfalt-dark.png');
+  opacity: 0.1;
+  z-index: -1;
+}
