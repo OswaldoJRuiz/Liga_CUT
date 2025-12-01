@@ -1,3 +1,13 @@
+El presente documento describe el desarrollo, estructura y funcionamiento de un microservicio web creado para gestionar y visualizar el calendario de partidos de una liga de fútbol universitaria.
+ El sistema permite consultar información como:
+Equipos participantes
+Jornadas
+Partidos programados, en juego y finalizados
+Fechas, horarios, lugares y marcadores
+El microservicio fue desarrollado en Java con Spring Boot, consumido por un frontend desarrollado en Angular, y conectado a una base de datos PostgreSQL
+
+
+
 # FrontendLiga
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.2.
